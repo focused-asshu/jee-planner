@@ -102,9 +102,19 @@ export const splitSecondsByLocalDate = (seconds, startedAtEpochMs, endedAtEpochM
 // 2. Call creditTime with timestamps from 23:58 to 00:05 local time; verify the two local date buckets split 120s/300s.
 // 3. Reset a chapter with existing dailySessions data; verify only timeStudiedSeconds resets to 0.
 // 4. Start chapter B while chapter A is running; verify A is credited before B becomes active.
-// 5. Load data with activeTimer; verify refresh recovery credits elapsed time and clears activeTimer without auto-resume.
+// 5. Load data with activeTimer older than 2 hours; verify refresh recovery credits exactly the capped 7200s and clears activeTimer.
 // 6. Load handcrafted version 1 data; verify migrateData chains v1 -> v2 -> v3 and preserves progress/time.
 // 7. Load version 3 data twice; verify the second load has no extra mutation or duplicate dailySessions data.
+
+
+// Manual V2B-2 capped auto-resume test plan:
+// 1. Timer running, refresh after 30 seconds: verify the recovered gap is credited, activeTimer remains set, the row shows Pause immediately, and Time Studied continues ticking.
+// 2. Refresh twice within 1 second: verify the second load credits only the tiny second gap because Case B rewrites startedAtEpochMs to the recovery timestamp.
+// 3. Simulate a 3-hour gap by editing localStorage[STORAGE_KEY].activeTimer.startedAtEpochMs to Date.now() - 3 * 60 * 60 * 1000 before reload; verify only 7200s are added and activeTimer is cleared.
+// 4. Boundary test at exactly 7200 seconds: verify it follows Case B because stale recovery uses gapSeconds > CAP_SECONDS, and no negative remaining/cap math is produced.
+// 5. Case B resume, then immediately start a different chapter: verify the existing switch path pauses and credits the resumed chapter before starting the new one.
+// 6. Stale capped recovery spanning local midnight: set activeTimer.startedAtEpochMs before midnight with the capped end after midnight; verify creditTime splits dailySessions over both dates.
+// 7. No activeTimer in storage: verify load is a clean no-op with no errors and no unexpected time credit.
 
 export const creditTime = (data, subject, chapterId, seconds, startedAtEpochMs, endedAtEpochMs = Date.now()) => {
   if (seconds <= 0) {
@@ -210,6 +220,8 @@ export const migrateData = (storedData) => {
   return nextData;
 };
 
+const CAP_SECONDS = 7200;
+
 const resolveActiveTimerOnLoad = (data) => {
   const { activeTimer } = data;
 
@@ -217,11 +229,44 @@ const resolveActiveTimerOnLoad = (data) => {
     return data;
   }
 
-  const elapsedSeconds = Math.max(0, Math.floor((Date.now() - activeTimer.startedAtEpochMs) / 1000));
+  const recoveredAtEpochMs = Date.now();
+  const gapSeconds = Math.max(0, Math.floor((recoveredAtEpochMs - activeTimer.startedAtEpochMs) / 1000));
+
+  // Exactly 7200 seconds is still treated as a normal refresh (Case B).
+  // Only gaps greater than the cap are stale, which matches the V2B-2 `>` requirement.
+  if (gapSeconds > CAP_SECONDS) {
+    const cappedEndedAtEpochMs = activeTimer.startedAtEpochMs + CAP_SECONDS * 1000;
+
+    return {
+      ...creditTime(
+        data,
+        activeTimer.subject,
+        activeTimer.chapterId,
+        CAP_SECONDS,
+        activeTimer.startedAtEpochMs,
+        cappedEndedAtEpochMs,
+      ),
+      activeTimer: null,
+    };
+  }
+
+  const creditedData = creditTime(
+    data,
+    activeTimer.subject,
+    activeTimer.chapterId,
+    gapSeconds,
+    activeTimer.startedAtEpochMs,
+    recoveredAtEpochMs,
+  );
 
   return {
-    ...creditTime(data, activeTimer.subject, activeTimer.chapterId, elapsedSeconds, activeTimer.startedAtEpochMs, Date.now()),
-    activeTimer: null,
+    ...creditedData,
+    activeTimer: {
+      ...activeTimer,
+      startedAtEpochMs: recoveredAtEpochMs,
+      accumulatedBeforeStartSeconds:
+        creditedData.subjects[activeTimer.subject][activeTimer.chapterId].timeStudiedSeconds,
+    },
   };
 };
 
