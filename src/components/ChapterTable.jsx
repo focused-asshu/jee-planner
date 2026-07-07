@@ -5,24 +5,12 @@ export function ChapterTable({
   chapters,
   progressByChapterId,
   activeTimer,
-  nowEpochMs,
   onFieldChange,
   onTimerStart,
   onTimerPause,
   onTimerReset,
   highlightedChapterId,
 }) {
-  const getDisplaySeconds = (chapterId) => {
-    if (activeTimer?.subject === subject && activeTimer?.chapterId === chapterId) {
-      return (
-        activeTimer.accumulatedBeforeStartSeconds +
-        Math.max(0, Math.floor((nowEpochMs - activeTimer.startedAtEpochMs) / 1000))
-      );
-    }
-
-    return progressByChapterId[chapterId].timeStudiedSeconds;
-  };
-
   return (
     <div className="max-h-[calc(100vh-320px)] overflow-auto rounded-lg border border-gray-200 bg-white shadow-sm">
       <table className="w-full min-w-[1080px] border-separate border-spacing-0 text-left">
@@ -47,7 +35,7 @@ export function ChapterTable({
               chapter={chapter}
               progress={progressByChapterId[chapter.id]}
               rowIndex={index}
-              displaySeconds={getDisplaySeconds(chapter.id)}
+              subject={subject}
               isTimerRunning={activeTimer?.subject === subject && activeTimer?.chapterId === chapter.id}
               onFieldChange={onFieldChange}
               onTimerStart={onTimerStart}
