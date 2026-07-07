@@ -1,4 +1,6 @@
+import { memo } from 'react';
 import { StatusSelector } from './StatusSelector';
+import { TimeStudiedCell } from './TimeStudiedCell';
 import { TimerControls } from './TimerControls';
 
 const checkboxFields = [
@@ -8,24 +10,11 @@ const checkboxFields = [
   { key: 'notesRevision', label: 'Notes/Revision' },
 ];
 
-const formatStudyTime = (seconds) => {
-  const safeSeconds = Math.max(0, Math.floor(seconds));
-  const totalMinutes = Math.floor(safeSeconds / 60);
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-
-  if (hours > 0) {
-    return `${hours}h ${minutes}m`;
-  }
-
-  return `${minutes}m ${safeSeconds % 60}s`;
-};
-
-export function ChapterRow({
+function ChapterRowComponent({
   chapter,
   progress,
   rowIndex,
-  displaySeconds,
+  subject,
   isTimerRunning,
   onFieldChange,
   onTimerStart,
@@ -64,7 +53,12 @@ export function ChapterRow({
           onChange={(value) => onFieldChange(chapter.id, 'testStatus', value)}
         />
       </td>
-      <td className="px-4 py-3 text-center text-sm text-gray-600">{formatStudyTime(displaySeconds)}</td>
+      <TimeStudiedCell
+        subject={subject}
+        chapterId={chapter.id}
+        timeStudiedSeconds={progress.timeStudiedSeconds}
+        isTimerRunning={isTimerRunning}
+      />
       <td className="px-4 py-3 text-center">
         <TimerControls
           hasSavedTime={progress.timeStudiedSeconds > 0}
@@ -77,3 +71,5 @@ export function ChapterRow({
     </tr>
   );
 }
+
+export const ChapterRow = memo(ChapterRowComponent);

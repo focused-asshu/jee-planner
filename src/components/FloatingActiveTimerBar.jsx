@@ -1,3 +1,5 @@
+import { useActiveTimer } from '../hooks/useActiveTimer';
+
 const formatFloatingTime = (seconds) => {
   const safeSeconds = Math.max(0, Math.floor(seconds));
   const totalMinutes = Math.floor(safeSeconds / 60);
@@ -12,6 +14,7 @@ const formatFloatingTime = (seconds) => {
 };
 
 export function FloatingActiveTimerBar({ activeTimerDetails, onNavigateToActiveTimer, onPause }) {
+  const activeTimer = useActiveTimer();
   const handleKeyDown = (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
@@ -22,6 +25,11 @@ export function FloatingActiveTimerBar({ activeTimerDetails, onNavigateToActiveT
   if (!activeTimerDetails) {
     return null;
   }
+
+  const displaySeconds =
+    activeTimer.activeSubject === activeTimerDetails.subject && activeTimer.activeChapterId === activeTimerDetails.chapterId
+      ? activeTimer.liveElapsedSeconds
+      : activeTimerDetails.accumulatedBeforeStartSeconds;
 
   return (
     <div className="fixed inset-x-0 bottom-5 z-50 flex justify-center px-4">
@@ -41,7 +49,7 @@ export function FloatingActiveTimerBar({ activeTimerDetails, onNavigateToActiveT
             </p>
           </div>
           <p className="rounded-full bg-red-50 px-3 py-1 font-mono text-lg font-semibold tabular-nums text-red-700">
-            {formatFloatingTime(activeTimerDetails.displaySeconds)}
+            {formatFloatingTime(displaySeconds)}
           </p>
         </div>
 

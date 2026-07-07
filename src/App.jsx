@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ChapterTable } from './components/ChapterTable';
 import { FloatingActiveTimerBar } from './components/FloatingActiveTimerBar';
 import { SubjectTabs } from './components/SubjectTabs';
 import { defaultChapters, subjectLabels } from './data/chapters';
-import { loadData, pauseActiveTimer, resetChapterTimer, startChapterTimer, updateChapterField } from './lib/storage';
+import { useTimer } from './hooks/useTimer';
 
 const isChapterComplete = (progress) =>
   progress.lectures &&
@@ -14,9 +14,14 @@ const isChapterComplete = (progress) =>
 
 export default function App() {
   const [activeSubject, setActiveSubject] = useState('physics');
-  const [plannerData, setPlannerData] = useState(() => loadData());
+  const {
+    plannerData,
+    handleFieldChange: updateTimerField,
+    handleTimerStart: startTimer,
+    handleTimerPause,
+    handleTimerReset: resetTimer,
+  } = useTimer();
   const [searchQuery, setSearchQuery] = useState('');
-  const [nowEpochMs, setNowEpochMs] = useState(() => Date.now());
   const [highlightedChapterId, setHighlightedChapterId] = useState(null);
 
   const activeChapters = defaultChapters[activeSubject];
@@ -53,22 +58,7 @@ export default function App() {
       ...activeTimer,
       subjectLabel: subjectLabels[activeTimer.subject],
       chapterName: chapter.name,
-      displaySeconds:
-        activeTimer.accumulatedBeforeStartSeconds +
-        Math.max(0, Math.floor((nowEpochMs - activeTimer.startedAtEpochMs) / 1000)),
     };
-  }, [nowEpochMs, plannerData.activeTimer]);
-
-  useEffect(() => {
-    if (!plannerData.activeTimer) {
-      return undefined;
-    }
-
-    const intervalId = window.setInterval(() => {
-      setNowEpochMs(Date.now());
-    }, 1000);
-
-    return () => window.clearInterval(intervalId);
   }, [plannerData.activeTimer]);
 
   const handleSubjectChange = (subject) => {
@@ -77,19 +67,11 @@ export default function App() {
   };
 
   const handleFieldChange = (chapterId, field, value) => {
-    setPlannerData((currentData) => updateChapterField(currentData, activeSubject, chapterId, field, value));
+    updateTimerField(activeSubject, chapterId, field, value);
   };
 
   const handleTimerStart = (chapterId) => {
-    const startedAtEpochMs = Date.now();
-    setNowEpochMs(startedAtEpochMs);
-    setPlannerData((currentData) => startChapterTimer(currentData, activeSubject, chapterId, startedAtEpochMs));
-  };
-
-  const handleTimerPause = () => {
-    const pausedAtEpochMs = Date.now();
-    setNowEpochMs(pausedAtEpochMs);
-    setPlannerData((currentData) => pauseActiveTimer(currentData, pausedAtEpochMs));
+    startTimer(activeSubject, chapterId);
   };
 
   const handleTimerReset = (chapterId) => {
@@ -97,8 +79,7 @@ export default function App() {
       return;
     }
 
-    setNowEpochMs(Date.now());
-    setPlannerData((currentData) => resetChapterTimer(currentData, activeSubject, chapterId));
+    resetTimer(activeSubject, chapterId);
   };
 
   const handleActiveTimerNavigate = () => {
@@ -167,7 +148,6 @@ export default function App() {
               chapters={filteredChapters}
               progressByChapterId={activeProgress}
               activeTimer={plannerData.activeTimer}
-              nowEpochMs={nowEpochMs}
               onFieldChange={handleFieldChange}
               onTimerStart={handleTimerStart}
               onTimerPause={handleTimerPause}
