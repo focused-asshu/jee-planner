@@ -1,7 +1,7 @@
 import { defaultChapters } from '../data/chapters';
 
 export const STORAGE_KEY = 'jee-planner-data';
-export const STORAGE_VERSION = 2;
+export const STORAGE_VERSION = 3;
 
 const defaultProgressRecord = (id) => ({
   id,
@@ -25,7 +25,48 @@ export const createDefaultData = () => ({
   version: STORAGE_VERSION,
   subjects: buildDefaultSubjects(),
   activeTimer: null,
+  dailySessions: {},
 });
+
+const getTodayKey = () => new Date().toLocaleDateString('en-CA');
+
+export const creditTime = (data, subject, chapterId, seconds) => {
+  if (seconds <= 0) {
+    return data;
+  }
+
+  const todayKey = getTodayKey();
+  const existingSession = data.dailySessions?.[todayKey] ?? {};
+  const currentChapter = data.subjects[subject][chapterId];
+
+  return {
+    ...data,
+    subjects: {
+      ...data.subjects,
+      [subject]: {
+        ...data.subjects[subject],
+        [chapterId]: {
+          ...currentChapter,
+          timeStudiedSeconds: currentChapter.timeStudiedSeconds + seconds,
+        },
+      },
+    },
+    dailySessions: {
+      ...(data.dailySessions ?? {}),
+      [todayKey]: {
+        totalSeconds: (existingSession.totalSeconds ?? 0) + seconds,
+        bySubject: {
+          ...(existingSession.bySubject ?? {}),
+          [subject]: (existingSession.bySubject?.[subject] ?? 0) + seconds,
+        },
+        byChapter: {
+          ...(existingSession.byChapter ?? {}),
+          [chapterId]: (existingSession.byChapter?.[chapterId] ?? 0) + seconds,
+        },
+      },
+    },
+  };
+};
 
 const sanitizeActiveTimer = (activeTimer, subjects) => {
   if (!activeTimer) {
@@ -80,15 +121,25 @@ const migrateData = (storedData) => {
     return storedData;
   }
 
-  if (storedData?.version === 1) {
-    return {
-      ...storedData,
-      version: STORAGE_VERSION,
+  let nextData = storedData;
+
+  if (nextData?.version === 1) {
+    nextData = {
+      ...nextData,
+      version: 2,
       activeTimer: null,
     };
   }
 
-  return storedData;
+  if (nextData?.version === 2) {
+    nextData = {
+      ...nextData,
+      version: 3,
+      dailySessions: nextData.dailySessions ?? {},
+    };
+  }
+
+  return nextData;
 };
 
 const resolveActiveTimerOnLoad = (data) => {
@@ -99,21 +150,10 @@ const resolveActiveTimerOnLoad = (data) => {
   }
 
   const elapsedSeconds = Math.max(0, Math.floor((Date.now() - activeTimer.startedAtEpochMs) / 1000));
-  const currentChapter = data.subjects[activeTimer.subject][activeTimer.chapterId];
 
   return {
-    ...data,
+    ...creditTime(data, activeTimer.subject, activeTimer.chapterId, elapsedSeconds),
     activeTimer: null,
-    subjects: {
-      ...data.subjects,
-      [activeTimer.subject]: {
-        ...data.subjects[activeTimer.subject],
-        [activeTimer.chapterId]: {
-          ...currentChapter,
-          timeStudiedSeconds: activeTimer.accumulatedBeforeStartSeconds + elapsedSeconds,
-        },
-      },
-    },
   };
 };
 
@@ -202,21 +242,10 @@ export const pauseActiveTimer = (data, pausedAtEpochMs = Date.now()) => {
   }
 
   const elapsedSeconds = Math.max(0, Math.floor((pausedAtEpochMs - activeTimer.startedAtEpochMs) / 1000));
-  const currentChapter = data.subjects[activeTimer.subject][activeTimer.chapterId];
 
   const nextData = {
-    ...data,
+    ...creditTime(data, activeTimer.subject, activeTimer.chapterId, elapsedSeconds),
     activeTimer: null,
-    subjects: {
-      ...data.subjects,
-      [activeTimer.subject]: {
-        ...data.subjects[activeTimer.subject],
-        [activeTimer.chapterId]: {
-          ...currentChapter,
-          timeStudiedSeconds: activeTimer.accumulatedBeforeStartSeconds + elapsedSeconds,
-        },
-      },
-    },
   };
 
   saveData(nextData);
