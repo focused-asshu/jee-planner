@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ChapterTable } from './components/ChapterTable';
 import { SubjectTabs } from './components/SubjectTabs';
 import { defaultChapters, subjectLabels } from './data/chapters';
-import { loadData, updateChapterField } from './lib/storage';
+import { loadData, pauseActiveTimer, resetChapterTimer, startChapterTimer, updateChapterField } from './lib/storage';
 
 const isChapterComplete = (progress) =>
   progress.lectures &&
@@ -15,6 +15,7 @@ export default function App() {
   const [activeSubject, setActiveSubject] = useState('physics');
   const [plannerData, setPlannerData] = useState(() => loadData());
   const [searchQuery, setSearchQuery] = useState('');
+  const [nowEpochMs, setNowEpochMs] = useState(() => Date.now());
 
   const activeChapters = defaultChapters[activeSubject];
   const activeProgress = plannerData.subjects[activeSubject];
@@ -31,6 +32,18 @@ export default function App() {
 
   const completedCount = activeChapters.filter((chapter) => isChapterComplete(activeProgress[chapter.id])).length;
 
+  useEffect(() => {
+    if (!plannerData.activeTimer) {
+      return undefined;
+    }
+
+    const intervalId = window.setInterval(() => {
+      setNowEpochMs(Date.now());
+    }, 1000);
+
+    return () => window.clearInterval(intervalId);
+  }, [plannerData.activeTimer]);
+
   const handleSubjectChange = (subject) => {
     setActiveSubject(subject);
     setSearchQuery('');
@@ -40,13 +53,34 @@ export default function App() {
     setPlannerData((currentData) => updateChapterField(currentData, activeSubject, chapterId, field, value));
   };
 
+  const handleTimerStart = (chapterId) => {
+    const startedAtEpochMs = Date.now();
+    setNowEpochMs(startedAtEpochMs);
+    setPlannerData((currentData) => startChapterTimer(currentData, activeSubject, chapterId, startedAtEpochMs));
+  };
+
+  const handleTimerPause = () => {
+    const pausedAtEpochMs = Date.now();
+    setNowEpochMs(pausedAtEpochMs);
+    setPlannerData((currentData) => pauseActiveTimer(currentData, pausedAtEpochMs));
+  };
+
+  const handleTimerReset = (chapterId) => {
+    if (!window.confirm('Reset study time for this chapter?')) {
+      return;
+    }
+
+    setNowEpochMs(Date.now());
+    setPlannerData((currentData) => resetChapterTimer(currentData, activeSubject, chapterId));
+  };
+
   return (
     <main className="min-h-screen bg-gray-50 px-8 py-8">
       <section className="mx-auto max-w-7xl">
         <div className="mb-6">
           <h1 className="text-2xl font-semibold tracking-tight text-gray-950">JEE Planner</h1>
           <p className="mt-2 text-sm text-gray-600">
-            V1 local-first study tracker for Physics, Chemistry, and Maths chapters.
+            V2A local-first study tracker with basic per-chapter stopwatches for Physics, Chemistry, and Maths.
           </p>
         </div>
 
@@ -80,9 +114,15 @@ export default function App() {
             </label>
 
             <ChapterTable
+              subject={activeSubject}
               chapters={filteredChapters}
               progressByChapterId={activeProgress}
+              activeTimer={plannerData.activeTimer}
+              nowEpochMs={nowEpochMs}
               onFieldChange={handleFieldChange}
+              onTimerStart={handleTimerStart}
+              onTimerPause={handleTimerPause}
+              onTimerReset={handleTimerReset}
             />
           </div>
         </div>
