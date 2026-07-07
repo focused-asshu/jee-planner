@@ -10,6 +10,7 @@ export function ChapterTable({
   onTimerStart,
   onTimerPause,
   onTimerReset,
+  highlightedChapterId,
 }) {
   const getDisplaySeconds = (chapterId) => {
     if (activeTimer?.subject === subject && activeTimer?.chapterId === chapterId) {
@@ -52,6 +53,7 @@ export function ChapterTable({
               onTimerStart={onTimerStart}
               onTimerPause={onTimerPause}
               onTimerReset={onTimerReset}
+              isHighlighted={highlightedChapterId === chapter.id}
             />
           ))}
         </tbody>

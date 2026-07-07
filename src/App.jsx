@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ChapterTable } from './components/ChapterTable';
+import { FloatingActiveTimerBar } from './components/FloatingActiveTimerBar';
 import { SubjectTabs } from './components/SubjectTabs';
 import { defaultChapters, subjectLabels } from './data/chapters';
 import { loadData, pauseActiveTimer, resetChapterTimer, startChapterTimer, updateChapterField } from './lib/storage';
@@ -16,6 +17,7 @@ export default function App() {
   const [plannerData, setPlannerData] = useState(() => loadData());
   const [searchQuery, setSearchQuery] = useState('');
   const [nowEpochMs, setNowEpochMs] = useState(() => Date.now());
+  const [highlightedChapterId, setHighlightedChapterId] = useState(null);
 
   const activeChapters = defaultChapters[activeSubject];
   const activeProgress = plannerData.subjects[activeSubject];
@@ -31,6 +33,31 @@ export default function App() {
   }, [activeChapters, searchQuery]);
 
   const completedCount = activeChapters.filter((chapter) => isChapterComplete(activeProgress[chapter.id])).length;
+
+  const activeTimerDetails = useMemo(() => {
+    const activeTimer = plannerData.activeTimer;
+
+    if (!activeTimer) {
+      return null;
+    }
+
+    const chapter = defaultChapters[activeTimer.subject]?.find(
+      (candidateChapter) => candidateChapter.id === activeTimer.chapterId,
+    );
+
+    if (!chapter) {
+      return null;
+    }
+
+    return {
+      ...activeTimer,
+      subjectLabel: subjectLabels[activeTimer.subject],
+      chapterName: chapter.name,
+      displaySeconds:
+        activeTimer.accumulatedBeforeStartSeconds +
+        Math.max(0, Math.floor((nowEpochMs - activeTimer.startedAtEpochMs) / 1000)),
+    };
+  }, [nowEpochMs, plannerData.activeTimer]);
 
   useEffect(() => {
     if (!plannerData.activeTimer) {
@@ -72,6 +99,28 @@ export default function App() {
 
     setNowEpochMs(Date.now());
     setPlannerData((currentData) => resetChapterTimer(currentData, activeSubject, chapterId));
+  };
+
+  const handleActiveTimerNavigate = () => {
+    if (!plannerData.activeTimer) {
+      return;
+    }
+
+    const { subject, chapterId } = plannerData.activeTimer;
+    setActiveSubject(subject);
+    setSearchQuery('');
+    setHighlightedChapterId(chapterId);
+
+    window.setTimeout(() => {
+      document.getElementById(`chapter-row-${chapterId}`)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }, 0);
+
+    window.setTimeout(() => {
+      setHighlightedChapterId((currentChapterId) => (currentChapterId === chapterId ? null : currentChapterId));
+    }, 1600);
   };
 
   return (
@@ -123,10 +172,16 @@ export default function App() {
               onTimerStart={handleTimerStart}
               onTimerPause={handleTimerPause}
               onTimerReset={handleTimerReset}
+              highlightedChapterId={highlightedChapterId}
             />
           </div>
         </div>
       </section>
+      <FloatingActiveTimerBar
+        activeTimerDetails={activeTimerDetails}
+        onNavigateToActiveTimer={handleActiveTimerNavigate}
+        onPause={handleTimerPause}
+      />
     </main>
   );
 }

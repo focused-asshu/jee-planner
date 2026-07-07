@@ -31,11 +31,15 @@ export function ChapterRow({
   onTimerStart,
   onTimerPause,
   onTimerReset,
+  isHighlighted = false,
 }) {
-  const rowBackground = rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+  const rowBackground = isHighlighted ? 'bg-red-100' : rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50';
 
   return (
-    <tr className={`group border-b border-gray-200 last:border-b-0 ${rowBackground} hover:bg-red-50/40`}>
+    <tr
+      id={`chapter-row-${chapter.id}`}
+      className={`group border-b border-gray-200 last:border-b-0 ${rowBackground} transition-colors duration-500 hover:bg-red-50/40`}
+    >
       <td
         className={`sticky left-0 z-10 min-w-56 px-4 py-3 text-sm font-medium text-gray-950 shadow-[1px_0_0_0_#e5e7eb] ${rowBackground} group-hover:bg-red-50`}
       >
