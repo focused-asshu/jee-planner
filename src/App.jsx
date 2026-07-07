@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ChapterTable } from './components/ChapterTable';
+import { FloatingActiveTimerBar } from './components/FloatingActiveTimerBar';
 import { SubjectTabs } from './components/SubjectTabs';
 import { defaultChapters, subjectLabels } from './data/chapters';
-import { loadData, updateChapterField } from './lib/storage';
+import { loadData, pauseActiveTimer, resetChapterTimer, startChapterTimer, updateChapterField } from './lib/storage';
 
 const isChapterComplete = (progress) =>
   progress.lectures &&
@@ -15,6 +16,8 @@ export default function App() {
   const [activeSubject, setActiveSubject] = useState('physics');
   const [plannerData, setPlannerData] = useState(() => loadData());
   const [searchQuery, setSearchQuery] = useState('');
+  const [nowEpochMs, setNowEpochMs] = useState(() => Date.now());
+  const [highlightedChapterId, setHighlightedChapterId] = useState(null);
 
   const activeChapters = defaultChapters[activeSubject];
   const activeProgress = plannerData.subjects[activeSubject];
@@ -31,6 +34,43 @@ export default function App() {
 
   const completedCount = activeChapters.filter((chapter) => isChapterComplete(activeProgress[chapter.id])).length;
 
+  const activeTimerDetails = useMemo(() => {
+    const activeTimer = plannerData.activeTimer;
+
+    if (!activeTimer) {
+      return null;
+    }
+
+    const chapter = defaultChapters[activeTimer.subject]?.find(
+      (candidateChapter) => candidateChapter.id === activeTimer.chapterId,
+    );
+
+    if (!chapter) {
+      return null;
+    }
+
+    return {
+      ...activeTimer,
+      subjectLabel: subjectLabels[activeTimer.subject],
+      chapterName: chapter.name,
+      displaySeconds:
+        activeTimer.accumulatedBeforeStartSeconds +
+        Math.max(0, Math.floor((nowEpochMs - activeTimer.startedAtEpochMs) / 1000)),
+    };
+  }, [nowEpochMs, plannerData.activeTimer]);
+
+  useEffect(() => {
+    if (!plannerData.activeTimer) {
+      return undefined;
+    }
+
+    const intervalId = window.setInterval(() => {
+      setNowEpochMs(Date.now());
+    }, 1000);
+
+    return () => window.clearInterval(intervalId);
+  }, [plannerData.activeTimer]);
+
   const handleSubjectChange = (subject) => {
     setActiveSubject(subject);
     setSearchQuery('');
@@ -40,13 +80,56 @@ export default function App() {
     setPlannerData((currentData) => updateChapterField(currentData, activeSubject, chapterId, field, value));
   };
 
+  const handleTimerStart = (chapterId) => {
+    const startedAtEpochMs = Date.now();
+    setNowEpochMs(startedAtEpochMs);
+    setPlannerData((currentData) => startChapterTimer(currentData, activeSubject, chapterId, startedAtEpochMs));
+  };
+
+  const handleTimerPause = () => {
+    const pausedAtEpochMs = Date.now();
+    setNowEpochMs(pausedAtEpochMs);
+    setPlannerData((currentData) => pauseActiveTimer(currentData, pausedAtEpochMs));
+  };
+
+  const handleTimerReset = (chapterId) => {
+    if (!window.confirm('Reset study time for this chapter?')) {
+      return;
+    }
+
+    setNowEpochMs(Date.now());
+    setPlannerData((currentData) => resetChapterTimer(currentData, activeSubject, chapterId));
+  };
+
+  const handleActiveTimerNavigate = () => {
+    if (!plannerData.activeTimer) {
+      return;
+    }
+
+    const { subject, chapterId } = plannerData.activeTimer;
+    setActiveSubject(subject);
+    setSearchQuery('');
+    setHighlightedChapterId(chapterId);
+
+    window.setTimeout(() => {
+      document.getElementById(`chapter-row-${chapterId}`)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }, 0);
+
+    window.setTimeout(() => {
+      setHighlightedChapterId((currentChapterId) => (currentChapterId === chapterId ? null : currentChapterId));
+    }, 1600);
+  };
+
   return (
     <main className="min-h-screen bg-gray-50 px-8 py-8">
       <section className="mx-auto max-w-7xl">
         <div className="mb-6">
           <h1 className="text-2xl font-semibold tracking-tight text-gray-950">JEE Planner</h1>
           <p className="mt-2 text-sm text-gray-600">
-            V1 local-first study tracker for Physics, Chemistry, and Maths chapters.
+            V2A local-first study tracker with basic per-chapter stopwatches for Physics, Chemistry, and Maths.
           </p>
         </div>
 
@@ -80,13 +163,25 @@ export default function App() {
             </label>
 
             <ChapterTable
+              subject={activeSubject}
               chapters={filteredChapters}
               progressByChapterId={activeProgress}
+              activeTimer={plannerData.activeTimer}
+              nowEpochMs={nowEpochMs}
               onFieldChange={handleFieldChange}
+              onTimerStart={handleTimerStart}
+              onTimerPause={handleTimerPause}
+              onTimerReset={handleTimerReset}
+              highlightedChapterId={highlightedChapterId}
             />
           </div>
         </div>
       </section>
+      <FloatingActiveTimerBar
+        activeTimerDetails={activeTimerDetails}
+        onNavigateToActiveTimer={handleActiveTimerNavigate}
+        onPause={handleTimerPause}
+      />
     </main>
   );
 }
