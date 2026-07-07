@@ -28,18 +28,96 @@ export const createDefaultData = () => ({
   dailySessions: {},
 });
 
-const getTodayKey = () => new Date().toLocaleDateString('en-CA');
+const getLocalDateKey = (epochMs) => new Date(epochMs).toLocaleDateString('en-CA');
 
-export const creditTime = (data, subject, chapterId, seconds) => {
+const getNextLocalMidnightEpochMs = (epochMs) => {
+  const date = new Date(epochMs);
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1).getTime();
+};
+
+const addDailySessionSeconds = (dailySessions, dateKey, subject, chapterId, seconds) => {
+  if (seconds <= 0) {
+    return dailySessions;
+  }
+
+  const existingSession = dailySessions?.[dateKey] ?? {};
+
+  return {
+    ...(dailySessions ?? {}),
+    [dateKey]: {
+      totalSeconds: (existingSession.totalSeconds ?? 0) + seconds,
+      bySubject: {
+        ...(existingSession.bySubject ?? {}),
+        [subject]: (existingSession.bySubject?.[subject] ?? 0) + seconds,
+      },
+      byChapter: {
+        ...(existingSession.byChapter ?? {}),
+        [chapterId]: (existingSession.byChapter?.[chapterId] ?? 0) + seconds,
+      },
+    },
+  };
+};
+
+export const splitSecondsByLocalDate = (seconds, startedAtEpochMs, endedAtEpochMs) => {
+  const safeSeconds = Math.max(0, Math.floor(seconds));
+
+  if (safeSeconds <= 0 || endedAtEpochMs <= startedAtEpochMs) {
+    return [];
+  }
+
+  const allocations = [];
+  let remainingSeconds = safeSeconds;
+  let cursorEpochMs = startedAtEpochMs;
+
+  while (remainingSeconds > 0 && cursorEpochMs < endedAtEpochMs) {
+    const currentDateKey = getLocalDateKey(cursorEpochMs);
+    const endedDateKey = getLocalDateKey(endedAtEpochMs);
+
+    if (currentDateKey === endedDateKey) {
+      allocations.push({ dateKey: currentDateKey, seconds: remainingSeconds });
+      break;
+    }
+
+    const nextMidnightEpochMs = getNextLocalMidnightEpochMs(cursorEpochMs);
+    const secondsBeforeMidnight = Math.min(
+      remainingSeconds,
+      Math.max(0, Math.round((nextMidnightEpochMs - cursorEpochMs) / 1000)),
+    );
+
+    allocations.push({ dateKey: currentDateKey, seconds: secondsBeforeMidnight });
+    remainingSeconds -= secondsBeforeMidnight;
+    cursorEpochMs = nextMidnightEpochMs;
+
+    if (secondsBeforeMidnight === 0) {
+      cursorEpochMs += 1;
+    }
+  }
+
+  return allocations;
+};
+
+
+// Manual V2B-1 edge-case test plan:
+// 1. Start and pause a same-day session; verify chapter time and dailySessions[today] increment equally.
+// 2. Call creditTime with timestamps from 23:58 to 00:05 local time; verify the two local date buckets split 120s/300s.
+// 3. Reset a chapter with existing dailySessions data; verify only timeStudiedSeconds resets to 0.
+// 4. Start chapter B while chapter A is running; verify A is credited before B becomes active.
+// 5. Load data with activeTimer; verify refresh recovery credits elapsed time and clears activeTimer without auto-resume.
+// 6. Load handcrafted version 1 data; verify migrateData chains v1 -> v2 -> v3 and preserves progress/time.
+// 7. Load version 3 data twice; verify the second load has no extra mutation or duplicate dailySessions data.
+
+export const creditTime = (data, subject, chapterId, seconds, startedAtEpochMs, endedAtEpochMs = Date.now()) => {
   if (seconds <= 0) {
     return data;
   }
 
-  const todayKey = getTodayKey();
-  const existingSession = data.dailySessions?.[todayKey] ?? {};
   const currentChapter = data.subjects[subject][chapterId];
+  const dailySessions = splitSecondsByLocalDate(seconds, startedAtEpochMs, endedAtEpochMs).reduce(
+    (sessions, allocation) => addDailySessionSeconds(sessions, allocation.dateKey, subject, chapterId, allocation.seconds),
+    data.dailySessions ?? {},
+  );
 
-  return {
+  const nextData = {
     ...data,
     subjects: {
       ...data.subjects,
@@ -51,21 +129,11 @@ export const creditTime = (data, subject, chapterId, seconds) => {
         },
       },
     },
-    dailySessions: {
-      ...(data.dailySessions ?? {}),
-      [todayKey]: {
-        totalSeconds: (existingSession.totalSeconds ?? 0) + seconds,
-        bySubject: {
-          ...(existingSession.bySubject ?? {}),
-          [subject]: (existingSession.bySubject?.[subject] ?? 0) + seconds,
-        },
-        byChapter: {
-          ...(existingSession.byChapter ?? {}),
-          [chapterId]: (existingSession.byChapter?.[chapterId] ?? 0) + seconds,
-        },
-      },
-    },
+    dailySessions,
   };
+
+  saveData(nextData);
+  return nextData;
 };
 
 const sanitizeActiveTimer = (activeTimer, subjects) => {
@@ -116,27 +184,27 @@ const mergeWithDefaults = (storedData) => {
   };
 };
 
-const migrateData = (storedData) => {
-  if (storedData?.version === STORAGE_VERSION) {
-    return storedData;
-  }
+export const migrateV1toV2 = (data) => ({
+  ...data,
+  version: 2,
+  activeTimer: null,
+});
 
+export const migrateV2toV3 = (data) => ({
+  ...data,
+  version: 3,
+  dailySessions: data.dailySessions ?? {},
+});
+
+export const migrateData = (storedData) => {
   let nextData = storedData;
 
   if (nextData?.version === 1) {
-    nextData = {
-      ...nextData,
-      version: 2,
-      activeTimer: null,
-    };
+    nextData = migrateV1toV2(nextData);
   }
 
   if (nextData?.version === 2) {
-    nextData = {
-      ...nextData,
-      version: 3,
-      dailySessions: nextData.dailySessions ?? {},
-    };
+    nextData = migrateV2toV3(nextData);
   }
 
   return nextData;
@@ -152,7 +220,7 @@ const resolveActiveTimerOnLoad = (data) => {
   const elapsedSeconds = Math.max(0, Math.floor((Date.now() - activeTimer.startedAtEpochMs) / 1000));
 
   return {
-    ...creditTime(data, activeTimer.subject, activeTimer.chapterId, elapsedSeconds),
+    ...creditTime(data, activeTimer.subject, activeTimer.chapterId, elapsedSeconds, activeTimer.startedAtEpochMs, Date.now()),
     activeTimer: null,
   };
 };
@@ -244,7 +312,7 @@ export const pauseActiveTimer = (data, pausedAtEpochMs = Date.now()) => {
   const elapsedSeconds = Math.max(0, Math.floor((pausedAtEpochMs - activeTimer.startedAtEpochMs) / 1000));
 
   const nextData = {
-    ...creditTime(data, activeTimer.subject, activeTimer.chapterId, elapsedSeconds),
+    ...creditTime(data, activeTimer.subject, activeTimer.chapterId, elapsedSeconds, activeTimer.startedAtEpochMs, pausedAtEpochMs),
     activeTimer: null,
   };
 
@@ -253,18 +321,15 @@ export const pauseActiveTimer = (data, pausedAtEpochMs = Date.now()) => {
 };
 
 export const resetChapterTimer = (data, subject, chapterId) => {
-  let nextData = data.activeTimer?.subject === subject && data.activeTimer?.chapterId === chapterId ? pauseActiveTimer(data) : data;
-
-  nextData = {
-    ...nextData,
-    activeTimer:
-      nextData.activeTimer?.subject === subject && nextData.activeTimer?.chapterId === chapterId ? null : nextData.activeTimer,
+  const nextData = {
+    ...data,
+    activeTimer: data.activeTimer?.subject === subject && data.activeTimer?.chapterId === chapterId ? null : data.activeTimer,
     subjects: {
-      ...nextData.subjects,
+      ...data.subjects,
       [subject]: {
-        ...nextData.subjects[subject],
+        ...data.subjects[subject],
         [chapterId]: {
-          ...nextData.subjects[subject][chapterId],
+          ...data.subjects[subject][chapterId],
           timeStudiedSeconds: 0,
         },
       },
