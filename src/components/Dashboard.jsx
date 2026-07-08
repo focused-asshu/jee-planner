@@ -9,6 +9,7 @@ import { formatStudyTime } from '../lib/format';
 import { getLocalDateKey } from '../lib/storage';
 import { getCompletionStats, getStreaks, getTodayCommittedSeconds, getTotalStudySeconds, isChapterComplete } from '../lib/stats';
 import { getConsistencySummary, getMostStudied, getRecentlyFinished, getSubjectBalance, getWeakChapters } from '../lib/insights';
+import { getMilestones } from '../lib/milestones';
 
 function BotanicalCorner() {
   return (
@@ -207,6 +208,90 @@ function StudyHeatmap({ dailySessions }) {
             {[0, 1, 2, 3, 4].map((level) => <span key={level} className={`h-3 w-3 rounded-[4px] border ${getStudyHeatmapCellClass(level)}`} />)}
             <span>More</span>
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const milestoneIconMap = {
+  book: BookOpen,
+  clock: Clock,
+  flame: Flame,
+  trophy: Trophy,
+};
+
+function MilestoneIcon({ icon, unlocked = false }) {
+  const Icon = milestoneIconMap[icon] ?? Trophy;
+  return (
+    <span className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${unlocked ? 'bg-sage-50 text-sage-700' : 'bg-amber-50 text-ember-600'}`}>
+      <Icon className="h-4 w-4" aria-hidden="true" />
+    </span>
+  );
+}
+
+function MilestonesCard({ plannerData }) {
+  const milestones = useMemo(() => getMilestones(plannerData, defaultChapters), [plannerData]);
+  const recentlyUnlocked = milestones.unlocked.slice(-4).reverse();
+  const nextMilestones = milestones.next.slice(0, 4);
+  const hasAnyMilestoneProgress = milestones.unlocked.length > 0 || nextMilestones.some((milestone) => milestone.progress > 0);
+
+  return (
+    <section className="rounded-2xl border border-border bg-paper p-6 shadow-card">
+      <div className="mb-5 flex items-start justify-between gap-3">
+        <div>
+          <h3 className="text-base font-semibold text-ink">Milestones</h3>
+          <p className="mt-1 text-sm text-ink-muted">A quiet journal of meaningful preparation moments, derived only from your planner.</p>
+        </div>
+        <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-sage-50 text-sage-700"><Trophy className="h-5 w-5" aria-hidden="true" /></span>
+      </div>
+
+      {!hasAnyMilestoneProgress ? (
+        <div className="rounded-2xl border border-sage-100 bg-sage-50/70 p-4 text-sm text-ink-muted">Your first milestone is waiting: commit one focused study session. The rest will unlock naturally as your planner grows.</div>
+      ) : null}
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="rounded-2xl border border-sage-100 bg-white/70 p-4">
+          <h4 className="flex items-center gap-2 text-sm font-semibold text-ink"><CheckCircle2 className="h-4 w-4 text-sage-700" />Recently Unlocked</h4>
+          {recentlyUnlocked.length ? (
+            <ol className="mt-3 space-y-3">
+              {recentlyUnlocked.map((milestone) => (
+                <li key={milestone.id} className="flex gap-3 rounded-xl bg-sage-50/60 p-3">
+                  <MilestoneIcon icon={milestone.icon} unlocked />
+                  <div>
+                    <p className="text-sm font-semibold text-ink">{milestone.title}</p>
+                    <p className="mt-1 text-xs leading-5 text-ink-muted">{milestone.description}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          ) : <p className="mt-3 text-sm text-ink-muted">No milestones unlocked yet. Start small; one committed session is enough to begin.</p>}
+        </div>
+
+        <div className="rounded-2xl border border-amber-100 bg-white/70 p-4">
+          <h4 className="flex items-center gap-2 text-sm font-semibold text-ink"><Flame className="h-4 w-4 text-ember-600" />Next to Chase</h4>
+          <ol className="mt-3 space-y-3">
+            {nextMilestones.map((milestone) => {
+              const percent = Math.round(milestone.progress * 100);
+              return (
+                <li key={milestone.id} className="rounded-xl border border-stone-100 bg-paper/80 p-3">
+                  <div className="flex gap-3">
+                    <MilestoneIcon icon={milestone.icon} />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-3">
+                        <p className="text-sm font-semibold text-ink">{milestone.title}</p>
+                        <span className="text-xs tabular-nums text-ink-muted">{percent}%</span>
+                      </div>
+                      <p className="mt-1 text-xs leading-5 text-ink-muted">{milestone.description}</p>
+                    </div>
+                  </div>
+                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-stone-100" aria-hidden="true">
+                    <div className="h-full rounded-full bg-ember-600 transition-[width] duration-500 ease-out" style={{ width: `${percent}%` }} />
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
         </div>
       </div>
     </section>
@@ -505,6 +590,10 @@ export function Dashboard({ plannerData }) {
 
       <div className="mt-6">
         <StudyInsights plannerData={plannerData} />
+      </div>
+
+      <div className="mt-6">
+        <MilestonesCard plannerData={plannerData} />
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
