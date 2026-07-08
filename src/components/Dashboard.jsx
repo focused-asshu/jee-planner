@@ -27,7 +27,7 @@ function StatCard({ label, value, helper, Icon, tone = 'neutral', empty = false 
   const iconTone = tone === 'ember' ? 'bg-ember-50 text-ember-700' : tone === 'sage' ? 'bg-sage-50 text-sage-700' : 'bg-sky-50 text-sky-600';
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/70 bg-white/75 p-6 shadow-card backdrop-blur-md transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-card-hover">
+    <div className="relative overflow-hidden rounded-2xl border border-sage-700/[0.15] bg-paper/85 p-6 shadow-card backdrop-blur-sm transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-card-hover">
       {empty ? <BotanicalCorner /> : null}
       <div className="relative flex items-start justify-between gap-3">
         <p className="text-sm font-medium text-ink-muted">{label}</p>
@@ -48,7 +48,7 @@ function CircularProgress({ percent, label }) {
   return (
     <div className="flex items-center gap-4 rounded-2xl border border-border/80 bg-paper/80 p-4">
       <svg className="h-24 w-24 -rotate-90" viewBox="0 0 100 100" aria-hidden="true">
-        <circle cx="50" cy="50" r={radius} stroke="currentColor" strokeWidth="8" className="text-stone-100" fill="none" />
+        <circle cx="50" cy="50" r={radius} stroke="currentColor" strokeWidth="8" className="text-[#E9EDE5]" fill="none" />
         <circle cx="50" cy="50" r={radius} stroke="currentColor" strokeWidth="8" className="text-ember-600 progress-ring" fill="none" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={offset} />
       </svg>
       <div>
@@ -88,7 +88,7 @@ const getStudyHeatmapIntensity = (seconds) => {
 
 const getStudyHeatmapCellClass = (intensity) => {
   const classes = [
-    'border-stone-200 bg-stone-100/80',
+    'border-stone-200 bg-[#E9EDE5]/80',
     'border-sage-100 bg-sage-100',
     'border-sage-200 bg-sage-300',
     'border-sage-300 bg-sage-500',
@@ -157,7 +157,7 @@ function StudyHeatmap({ dailySessions }) {
   const hasStudySessions = useMemo(() => Object.values(dailySessions ?? {}).some((session) => Math.max(0, Math.floor(session?.totalSeconds ?? 0)) > 0), [dailySessions]);
 
   return (
-    <section className="rounded-2xl border border-white/70 bg-white/75 p-6 shadow-card backdrop-blur-md">
+    <section className="rounded-2xl border border-sage-700/[0.15] bg-paper/85 p-6 shadow-card backdrop-blur-sm">
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h3 className="text-base font-semibold text-ink">Study Heatmap</h3>
@@ -238,7 +238,7 @@ function MilestonesCard({ plannerData }) {
   const hasAnyMilestoneProgress = milestones.unlocked.length > 0 || nextMilestones.some((milestone) => milestone.progress > 0);
 
   return (
-    <section className="rounded-2xl border border-white/70 bg-white/75 p-6 shadow-card backdrop-blur-md">
+    <section className="rounded-2xl border border-sage-700/[0.15] bg-paper/85 p-6 shadow-card backdrop-blur-sm">
       <div className="mb-5 flex items-start justify-between gap-3">
         <div>
           <h3 className="text-base font-semibold text-ink">Milestones</h3>
@@ -252,7 +252,7 @@ function MilestonesCard({ plannerData }) {
       ) : null}
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-2xl border border-sage-100 bg-white/70 p-4">
+        <div className="rounded-2xl border border-sage-700/[0.12] bg-paper/75 p-4">
           <h4 className="flex items-center gap-2 text-sm font-semibold text-ink"><CheckCircle2 className="h-4 w-4 text-sage-700" />Recently Unlocked</h4>
           {recentlyUnlocked.length ? (
             <ol className="mt-3 space-y-3">
@@ -269,7 +269,7 @@ function MilestonesCard({ plannerData }) {
           ) : <p className="mt-3 text-sm text-ink-muted">No milestones unlocked yet. Start small; one committed session is enough to begin.</p>}
         </div>
 
-        <div className="rounded-2xl border border-amber-100 bg-white/70 p-4">
+        <div className="rounded-2xl border border-amber-200/70 bg-paper/75 p-4">
           <h4 className="flex items-center gap-2 text-sm font-semibold text-ink"><Flame className="h-4 w-4 text-ember-600" />Next to Chase</h4>
           <ol className="mt-3 space-y-3">
             {nextMilestones.map((milestone) => {
@@ -286,7 +286,7 @@ function MilestonesCard({ plannerData }) {
                       <p className="mt-1 text-xs leading-5 text-ink-muted">{milestone.description}</p>
                     </div>
                   </div>
-                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-stone-100" aria-hidden="true">
+                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#E9EDE5]" aria-hidden="true">
                     <div className="h-full rounded-full bg-ember-600 transition-[width] duration-500 ease-out" style={{ width: `${percent}%` }} />
                   </div>
                 </li>
@@ -309,7 +309,7 @@ function StudyInsights({ plannerData }) {
   const hasInsightData = weakChapters.length > 0 || mostStudied.length > 0 || recentlyFinished.length > 0 || Object.values(subjectBalance.totals).some((seconds) => seconds > 0) || consistency.studiedLastSevenDays > 0;
 
   return (
-    <section className="rounded-2xl border border-white/70 bg-white/75 p-6 shadow-card backdrop-blur-md">
+    <section className="rounded-2xl border border-sage-700/[0.15] bg-paper/85 p-6 shadow-card backdrop-blur-sm">
       <div className="mb-5 flex items-start justify-between gap-3">
         <div>
           <h3 className="text-base font-semibold text-ink">Study Insights</h3>
@@ -323,30 +323,30 @@ function StudyInsights({ plannerData }) {
       ) : null}
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-2xl border border-amber-100 bg-white/70 p-4">
+        <div className="rounded-2xl border border-amber-200/70 bg-paper/75 p-4">
           <h4 className="flex items-center gap-2 text-sm font-semibold text-ink"><Flame className="h-4 w-4 text-amber-600" />Needs Attention</h4>
           {weakChapters.length ? <ol className="mt-3 space-y-2">{weakChapters.map((chapter) => <li key={`${chapter.subject}-${chapter.id}`} className="flex items-center justify-between gap-3 text-sm"><span className={chapter.isWeak ? 'font-semibold text-ink' : 'text-ink'}>{chapter.name}</span><span className="text-xs text-ink-muted">{chapter.subjectLabel}</span></li>)}</ol> : <p className="mt-3 text-sm text-ink-muted">No urgent weak spots yet. Keep completing the next small step.</p>}
         </div>
 
-        <div className="rounded-2xl border border-sage-100 bg-white/70 p-4">
+        <div className="rounded-2xl border border-sage-700/[0.12] bg-paper/75 p-4">
           <h4 className="flex items-center gap-2 text-sm font-semibold text-ink"><Trophy className="h-4 w-4 text-sage-700" />Most Studied</h4>
           {mostStudied.length ? <ol className="mt-3 space-y-2">{mostStudied.map((chapter) => <li key={`${chapter.subject}-${chapter.id}`} className="flex items-center justify-between gap-3 text-sm text-ink"><span>{chapter.name}</span><span className="text-xs tabular-nums text-ink-muted">{formatStudyTime(chapter.timeStudiedSeconds)}</span></li>)}</ol> : <p className="mt-3 text-sm text-ink-muted">Study time will appear here after your first committed session.</p>}
         </div>
 
         {recentlyFinished.length ? (
-          <div className="rounded-2xl border border-sky-100 bg-white/70 p-4">
+          <div className="rounded-2xl border border-sky-100/80 bg-paper/75 p-4">
             <h4 className="flex items-center gap-2 text-sm font-semibold text-ink"><BookOpen className="h-4 w-4 text-sky-600" />Recently Finished</h4>
             <ol className="mt-3 space-y-2">{recentlyFinished.map((chapter) => <li key={`${chapter.subject}-${chapter.id}`} className="flex items-center justify-between gap-3 text-sm text-ink"><span>{chapter.name}</span><span className="text-xs text-ink-muted">{chapter.dateKey}</span></li>)}</ol>
           </div>
         ) : null}
 
-        <div className="rounded-2xl border border-border bg-white/70 p-4">
+        <div className="rounded-2xl border border-sage-700/[0.12] bg-paper/75 p-4">
           <h4 className="flex items-center gap-2 text-sm font-semibold text-ink"><Clock className="h-4 w-4 text-sky-600" />Subject Balance</h4>
           <p className="mt-3 text-sm text-ink">{subjectBalance.message}</p>
           <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-ink-muted">{Object.entries(subjectBalance.totals).map(([subject, seconds]) => <span key={subject} className="rounded-xl bg-stone-50 px-2 py-1 text-center tabular-nums">{subjectLabels[subject]}<br />{formatStudyTime(seconds)}</span>)}</div>
         </div>
 
-        <div className="rounded-2xl border border-border bg-white/70 p-4 lg:col-span-2">
+        <div className="rounded-2xl border border-sage-700/[0.12] bg-paper/75 p-4 lg:col-span-2">
           <h4 className="flex items-center gap-2 text-sm font-semibold text-ink"><CheckCircle2 className="h-4 w-4 text-sage-700" />Consistency</h4>
           <p className="mt-3 text-sm text-ink">{consistency.message}</p>
         </div>
@@ -418,7 +418,7 @@ function DailyJournalCard() {
   }, [entry, todayKey]);
 
   return (
-    <section className="rounded-2xl border border-amber-100/80 bg-[#FFF8E8]/80 p-5 shadow-card backdrop-blur-md">
+    <section className="rounded-2xl border border-amber-100/80 bg-[#FFF8E8]/78 p-5 shadow-card backdrop-blur-sm">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h3 className="flex items-center gap-2 text-base font-semibold text-ink"><BookOpen className="h-4 w-4 text-ember-600" />Daily Journal</h3>
@@ -479,7 +479,7 @@ function AmbientModeCard() {
   };
 
   return (
-    <section className="rounded-2xl border border-sage-100/90 bg-sage-50/75 p-5 shadow-card backdrop-blur-md">
+    <section className="rounded-2xl border border-sage-100/90 bg-sage-50/80 p-5 shadow-card backdrop-blur-sm">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h3 className="text-base font-semibold text-ink">Ambient Mode</h3>
@@ -561,21 +561,21 @@ export function Dashboard({ plannerData }) {
     <div className="relative overflow-hidden p-7 dashboard-view">
       <DashboardAtmosphere />
       <BotanicalCorner />
-      <div className="relative mb-7 flex flex-wrap items-end justify-between gap-4">
+      <div className="relative mb-9 flex flex-wrap items-end justify-between gap-5 rounded-[1.75rem] border border-sage-700/[0.08] bg-paper/35 px-5 py-4 shadow-[0_18px_44px_rgba(95,113,79,0.07)]">
         <div>
           <p className="text-sm font-medium text-ink-muted">Dashboard</p>
-          <h2 className="mt-1 text-3xl font-bold tracking-tight text-ink">{getGreeting()}</h2>
+          <h2 className="mt-1 text-3xl font-semibold tracking-tight text-ink">{getGreeting()}</h2>
           <p className="mt-2 text-sm text-ink-muted">{motivationalLines[getDayIndex(motivationalLines.length)]}</p>
         </div>
         <div className="rounded-full border border-sage-200 bg-sage-50 px-4 py-2 text-sm font-medium text-sage-700">Calm focus mode ready • Press F</div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <div className="rounded-2xl border border-white/70 bg-white/72 p-6 shadow-card backdrop-blur-md lg:col-span-2">
+        <div className="rounded-2xl border border-sage-700/[0.15] bg-paper/85 p-6 shadow-card backdrop-blur-sm lg:col-span-2">
           <div className="flex items-start justify-between gap-4"><div><h3 className="text-base font-semibold text-ink">{JEE_MAIN_EXAM.label}</h3><p className="mt-2 text-3xl font-bold tabular-nums text-ink">{daysRemaining} Days Remaining</p></div><CircularProgress percent={overallPercent} label="Syllabus" /></div>
-          <div className="mt-5 h-2.5 overflow-hidden rounded-full bg-stone-100"><div className="h-full rounded-full bg-ember-600 transition-[width] duration-500 ease-out" style={{ width: `${countdownPercent}%` }} /></div>
+          <div className="mt-5 h-2.5 overflow-hidden rounded-full bg-[#E9EDE5]"><div className="h-full rounded-full bg-ember-600 transition-[width] duration-500 ease-out" style={{ width: `${countdownPercent}%` }} /></div>
         </div>
-        <div className="rounded-2xl border border-white/70 bg-white/72 p-6 shadow-card backdrop-blur-md"><h3 className="text-base font-semibold text-ink">Today's Mission</h3><ul className="mt-4 space-y-3">{missionItems.map((item) => <li key={item} className="flex items-center gap-3 text-sm text-ink"><span className="h-2 w-2 rounded-full bg-sage-500" />{item}</li>)}</ul></div>
+        <div className="rounded-2xl border border-sage-700/[0.15] bg-paper/85 p-6 shadow-card backdrop-blur-sm"><h3 className="text-base font-semibold text-ink">Today's Mission</h3><ul className="mt-4 space-y-3">{missionItems.map((item) => <li key={item} className="flex items-center gap-3 text-sm text-ink"><span className="h-2 w-2 rounded-full bg-sage-500" />{item}</li>)}</ul></div>
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -608,11 +608,11 @@ export function Dashboard({ plannerData }) {
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[1fr_320px]">
-        <div className="rounded-2xl border border-white/70 bg-white/75 p-6 shadow-card backdrop-blur-md">
+        <div className="rounded-2xl border border-sage-700/[0.15] bg-paper/85 p-6 shadow-card backdrop-blur-sm">
           <div className="mb-4"><h3 className="text-base font-semibold text-ink">Subject Progress</h3><p className="mt-1 text-sm text-ink-muted">Completion by subject, using the same criteria as the Study Planner.</p></div>
-          <div className="space-y-4">{Object.entries(completionStats.bySubject).map(([subject, stats]) => { const percent = stats.total > 0 ? (stats.completed / stats.total) * 100 : 0; return <div key={subject}><div className="mb-2 flex items-center justify-between text-sm"><span className="font-medium text-ink">{subjectLabels[subject]}</span><span className="tabular-nums text-ink-muted">{stats.completed} / {stats.total} chapters</span></div><div className="h-3 overflow-hidden rounded-full bg-stone-100"><div className="h-full rounded-full bg-ember-600 transition-[width] duration-500 ease-out" style={{ width: `${percent}%` }} /></div></div>; })}</div>
+          <div className="space-y-4">{Object.entries(completionStats.bySubject).map(([subject, stats]) => { const percent = stats.total > 0 ? (stats.completed / stats.total) * 100 : 0; return <div key={subject}><div className="mb-2 flex items-center justify-between text-sm"><span className="font-medium text-ink">{subjectLabels[subject]}</span><span className="tabular-nums text-ink-muted">{stats.completed} / {stats.total} chapters</span></div><div className="h-3 overflow-hidden rounded-full bg-[#E9EDE5]"><div className="h-full rounded-full bg-ember-600 transition-[width] duration-500 ease-out" style={{ width: `${percent}%` }} /></div></div>; })}</div>
         </div>
-        <div className="relative overflow-hidden rounded-2xl border border-white/70 bg-white/70 p-6 shadow-card backdrop-blur-md"><BotanicalCorner /><Search className="h-5 w-5 text-sky-600" aria-hidden="true" /><p className="relative mt-5 text-lg font-semibold leading-relaxed text-ink">“{studyQuotes[getDayIndex(studyQuotes.length)]}”</p><p className="relative mt-3 text-xs font-medium uppercase tracking-wide text-ink-muted">Daily study note</p></div>
+        <div className="relative overflow-hidden rounded-2xl border border-sage-700/[0.15] bg-paper/82 p-6 shadow-card backdrop-blur-sm"><BotanicalCorner /><Search className="h-5 w-5 text-sky-600" aria-hidden="true" /><p className="relative mt-5 text-lg font-semibold leading-relaxed text-ink">“{studyQuotes[getDayIndex(studyQuotes.length)]}”</p><p className="relative mt-3 text-xs font-medium uppercase tracking-wide text-ink-muted">Daily study note</p></div>
       </div>
     </div>
   );
