@@ -342,3 +342,127 @@ input {
     animation: none !important;
   }
 }
+
+.dashboard-view {
+  background:
+    radial-gradient(circle at 86% 3%, rgba(255, 224, 164, 0.34), transparent 25rem),
+    radial-gradient(circle at 18% 5%, rgba(142, 163, 122, 0.22), transparent 30rem),
+    radial-gradient(circle at 68% 38%, rgba(95, 113, 79, 0.10), transparent 35rem),
+    linear-gradient(135deg, rgba(241, 244, 232, 0.72), rgba(252, 248, 236, 0.62));
+}
+
+.dashboard-view::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.34;
+  background-image:
+    radial-gradient(rgba(95, 113, 79, 0.12) 0.55px, transparent 0.75px),
+    linear-gradient(105deg, rgba(95, 113, 79, 0.035) 0 1px, transparent 1px 18px);
+  background-size: 26px 26px, 42px 42px;
+  mask-image: linear-gradient(to bottom, black 0%, black 88%, transparent 100%);
+}
+
+.dashboard-card,
+.dashboard-card-subtle {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid rgba(95, 113, 79, 0.17);
+  background:
+    linear-gradient(145deg, rgba(255, 252, 241, 0.9), rgba(241, 246, 232, 0.82)),
+    radial-gradient(circle at 8% 0%, rgba(255, 229, 179, 0.20), transparent 17rem);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    inset 0 -20px 50px rgba(95, 113, 79, 0.035),
+    0 18px 42px rgba(86, 103, 72, 0.105),
+    0 2px 8px rgba(86, 103, 72, 0.055);
+  backdrop-filter: blur(10px);
+}
+
+.dashboard-card::before,
+.dashboard-card-subtle::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.28;
+  background-image:
+    radial-gradient(rgba(95, 113, 79, 0.13) 0.45px, transparent 0.65px),
+    linear-gradient(120deg, transparent 0 46%, rgba(255, 255, 255, 0.42) 50%, transparent 55%);
+  background-size: 18px 18px, 100% 100%;
+}
+
+.dashboard-card-subtle {
+  border-color: rgba(95, 113, 79, 0.13);
+  background: linear-gradient(145deg, rgba(255, 252, 241, 0.78), rgba(240, 246, 230, 0.66));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.68), 0 10px 26px rgba(86,103,72,0.07);
+}
+
+.dashboard-hero {
+  border: 1px solid rgba(95, 113, 79, 0.18);
+  background:
+    radial-gradient(circle at 86% 18%, rgba(255, 216, 145, 0.38), transparent 20rem),
+    radial-gradient(circle at 18% 0%, rgba(142, 163, 122, 0.24), transparent 24rem),
+    linear-gradient(135deg, rgba(255, 251, 238, 0.84), rgba(234, 242, 222, 0.74));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.76),
+    inset 0 -28px 70px rgba(95, 113, 79, 0.055),
+    0 24px 60px rgba(75, 91, 62, 0.13);
+}
+
+.dashboard-hero::before {
+  content: "";
+  position: absolute;
+  right: -2rem;
+  top: -5rem;
+  height: 22rem;
+  width: 22rem;
+  opacity: 0.06;
+  background: no-repeat center / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 220'%3E%3Cg fill='none' stroke='%235F714F' stroke-width='5' stroke-linecap='round'%3E%3Cpath d='M123 14C67 52 37 102 32 168'/%3E%3Cpath d='M113 38C78 47 55 74 51 112C46 159 80 190 121 177C165 163 185 105 165 65C154 43 136 33 113 38Z'/%3E%3Cpath d='M101 57C99 87 105 119 119 150M67 92C87 99 103 111 116 130M150 89C135 103 124 119 119 139M73 158C56 169 43 182 32 199M159 154C174 166 184 180 191 199'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.dashboard-hero-orbit {
+  position: absolute;
+  inset: -2rem 6rem auto auto;
+  height: 17rem;
+  width: 35rem;
+  opacity: 0.08;
+  background: no-repeat center / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 520 260' fill='none'%3E%3Cg stroke='%235F714F' stroke-width='2' stroke-linecap='round'%3E%3Cellipse cx='260' cy='130' rx='210' ry='56' stroke-dasharray='8 13'/%3E%3Cellipse cx='260' cy='130' rx='180' ry='42' transform='rotate(-19 260 130)' stroke-dasharray='7 12'/%3E%3Cellipse cx='260' cy='130' rx='148' ry='33' transform='rotate(27 260 130)' stroke-dasharray='5 13'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.dashboard-monstera {
+  position: absolute;
+  right: -3rem;
+  top: -2.5rem;
+  width: 26rem;
+  color: #5F714F;
+  opacity: 0.055;
+}
+
+.dashboard-monstera-stem,
+.dashboard-monstera-veins,
+.dashboard-monstera-cuts {
+  stroke: currentColor;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dashboard-monstera-leaf { fill: currentColor; }
+.dashboard-monstera-veins { stroke-width: 4; opacity: 0.75; }
+.dashboard-monstera-cuts { stroke-width: 10; opacity: 0.45; }
+
+.dashboard-equation {
+  position: absolute;
+  color: #5F714F;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.82rem;
+  font-style: italic;
+  opacity: 0.095;
+}
+.dashboard-equation-one { left: 6%; top: 17rem; }
+.dashboard-equation-two { right: 25%; top: 2.2rem; }
+.dashboard-equation-three { right: 13%; top: 34rem; }
+.dashboard-equation-four { left: 34%; top: 47rem; }
