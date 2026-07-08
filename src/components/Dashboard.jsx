@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 import { CheckCircle2, Clock, Flame, Hourglass, Search, Trophy } from 'lucide-react';
+import { Bookshelf } from './Bookshelf';
+import { PlantCompanion } from './PlantCompanion';
 import { JEE_MAIN_EXAM, motivationalLines, studyQuotes } from '../data/delight';
 import { defaultChapters, subjectLabels } from '../data/chapters';
 import { useActiveTimer } from '../hooks/useActiveTimer';
@@ -135,6 +137,11 @@ export function Dashboard({ plannerData }) {
         <StatCard label="Today's Study Time" value={todayStudySeconds > 0 ? formatStudyTime(todayStudySeconds) : 'Fresh start'} helper={todayStudySeconds > 0 ? "Committed sessions plus today's active timer" : 'Begin with one quiet timer session.'} Icon={Hourglass} empty={todayStudySeconds === 0} />
         <StatCard label="Current Streak" value={currentStreak > 0 ? formatStreak(currentStreak) : 'Start today!'} helper="Yesterday keeps the streak alive" Icon={Flame} tone="ember" />
         <StatCard label="Best Streak" value={formatStreak(committedStreaks.bestStreak)} helper="Longest committed run" Icon={Trophy} tone="ember" />
+      </div>
+
+      <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <Bookshelf plannerData={plannerData} />
+        <PlantCompanion totalStudySeconds={committedTotalStudySeconds} />
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[1fr_320px]">
