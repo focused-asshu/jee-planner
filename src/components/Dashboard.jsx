@@ -11,6 +11,7 @@ import { getLocalDateKey } from '../lib/storage';
 import { getCompletionStats, getStreaks, getTodayCommittedSeconds, getTotalStudySeconds, isChapterComplete } from '../lib/stats';
 import { getConsistencySummary, getMostStudied, getRecentlyFinished, getSubjectBalance, getWeakChapters } from '../lib/insights';
 import { getMilestones } from '../lib/milestones';
+import { getJeeMainCountdown } from '../lib/countdown';
 
 
 function StatCard({ label, value, helper, Icon, tone = 'neutral', empty = false }) {
@@ -510,6 +511,11 @@ const getGreeting = () => {
 
 const getDayIndex = (length) => Math.floor(Date.now() / 86400000) % length;
 
+const getMsUntilNextLocalMidnight = (date = new Date()) => {
+  const nextMidnight = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
+  return nextMidnight.getTime() - date.getTime();
+};
+
 const getMissionItems = (plannerData) => {
   const items = [];
   Object.entries(defaultChapters).some(([subject, chapters]) => {
@@ -535,8 +541,15 @@ export function Dashboard({ plannerData }) {
   const todayCommittedSeconds = useMemo(() => getTodayCommittedSeconds(plannerData), [plannerData]);
   const committedStreaks = useMemo(() => getStreaks(plannerData, 0), [plannerData]);
   const missionItems = useMemo(() => getMissionItems(plannerData), [plannerData]);
-  const examMs = new Date(JEE_MAIN_EXAM.date).getTime();
-  const daysRemaining = Math.max(0, Math.ceil((examMs - Date.now()) / 86400000));
+  const [countdownDay, setCountdownDay] = useState(() => new Date());
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => setCountdownDay(new Date()), getMsUntilNextLocalMidnight() + 1000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [countdownDay]);
+
+  const daysRemaining = getJeeMainCountdown(countdownDay);
   const countdownPercent = Math.min(100, Math.max(0, ((365 - daysRemaining) / 365) * 100));
   const overallPercent = completionStats.total > 0 ? (completionStats.completed / completionStats.total) * 100 : 0;
 
