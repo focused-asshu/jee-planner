@@ -13,7 +13,7 @@ const formatFloatingTime = (seconds) => {
   return `${String(minutes).padStart(2, '0')}m ${String(safeSeconds % 60).padStart(2, '0')}s`;
 };
 
-export function FloatingActiveTimerBar({ activeTimerDetails, onNavigateToActiveTimer, onPause }) {
+export function FloatingActiveTimerBar({ activeTimerDetails, onNavigateToActiveTimer, onPause, onStop }) {
   const activeTimer = useActiveTimer();
   const handleKeyDown = (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
@@ -68,7 +68,7 @@ export function FloatingActiveTimerBar({ activeTimerDetails, onNavigateToActiveT
             type="button"
             onClick={(event) => {
               event.stopPropagation();
-              onPause();
+              onStop();
             }}
             className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-200"
           >

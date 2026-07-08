@@ -1,6 +1,14 @@
 import { useEffect, useState } from 'react';
 import { timerStore } from '../lib/timerStore';
-import { loadData, pauseActiveTimer, resetChapterTimer, saveData, startChapterTimer, updateChapterField } from '../lib/storage';
+import {
+  loadData,
+  pauseActiveTimer,
+  resetChapterTimer,
+  saveData,
+  startChapterTimer,
+  stopActiveTimer,
+  updateChapterField,
+} from '../lib/storage';
 
 export function useTimer() {
   const [plannerData, setPlannerData] = useState(() => loadData());
@@ -78,6 +86,12 @@ export function useTimer() {
     setPlannerData((currentData) => pauseActiveTimer(currentData, pausedAtEpochMs));
   };
 
+  const handleTimerStop = () => {
+    const stoppedAtEpochMs = Date.now();
+    timerStore.stopTicking();
+    setPlannerData((currentData) => stopActiveTimer(currentData, stoppedAtEpochMs));
+  };
+
   const handleTimerReset = (subject, chapterId) => {
     setPlannerData((currentData) => {
       const nextData = resetChapterTimer(currentData, subject, chapterId);
@@ -95,6 +109,7 @@ export function useTimer() {
     handleFieldChange,
     handleTimerStart,
     handleTimerPause,
+    handleTimerStop,
     handleTimerReset,
   };
 }

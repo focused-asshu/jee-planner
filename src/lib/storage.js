@@ -365,6 +365,8 @@ export const pauseActiveTimer = (data, pausedAtEpochMs = Date.now()) => {
   return nextData;
 };
 
+export const stopActiveTimer = (data, stoppedAtEpochMs = Date.now()) => pauseActiveTimer(data, stoppedAtEpochMs);
+
 export const resetChapterTimer = (data, subject, chapterId) => {
   const nextData = {
     ...data,
