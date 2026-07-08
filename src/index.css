@@ -15,12 +15,48 @@ html {
 body {
   margin: 0;
   min-width: 1024px;
-  background:
+  background: #FAFAF9;
+}
+
+
+.app-shell {
+  --time-bg:
     radial-gradient(circle at 18% 0%, rgba(14, 165, 233, 0.08), transparent 30rem),
     radial-gradient(circle at 82% 12%, rgba(220, 38, 38, 0.055), transparent 24rem),
-    linear-gradient(135deg, rgba(255,255,255,0.76), rgba(250,250,249,0.96)),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.76), rgba(250, 250, 249, 0.96)),
     #FAFAF9;
+  background: var(--time-bg);
   background-attachment: fixed;
+  transition: background 700ms ease, color 200ms ease;
+}
+
+.app-theme-morning {
+  --time-bg:
+    radial-gradient(circle at 16% 4%, rgba(251, 191, 36, 0.18), transparent 25rem),
+    radial-gradient(circle at 78% 10%, rgba(254, 226, 196, 0.58), transparent 30rem),
+    linear-gradient(135deg, #FFF7E8 0%, #FFFCF5 46%, #FAFAF9 100%);
+}
+
+.app-theme-afternoon {
+  --time-bg:
+    radial-gradient(circle at 18% 0%, rgba(14, 165, 233, 0.075), transparent 30rem),
+    radial-gradient(circle at 84% 16%, rgba(221, 230, 213, 0.42), transparent 24rem),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(250, 250, 249, 0.98)),
+    #FAFAF9;
+}
+
+.app-theme-evening {
+  --time-bg:
+    radial-gradient(circle at 18% 2%, rgba(245, 158, 11, 0.18), transparent 28rem),
+    radial-gradient(circle at 82% 10%, rgba(220, 38, 38, 0.08), transparent 26rem),
+    linear-gradient(135deg, #FFF3D7 0%, #FFF8EB 48%, #FAFAF9 100%);
+}
+
+.app-theme-night {
+  --time-bg:
+    radial-gradient(circle at 18% 0%, rgba(14, 165, 233, 0.055), transparent 28rem),
+    radial-gradient(circle at 80% 12%, rgba(120, 113, 108, 0.16), transparent 24rem),
+    linear-gradient(135deg, #EDE7DD 0%, #F6F0E8 52%, #F9F6F1 100%);
 }
 
 body::before {

@@ -9,6 +9,34 @@ import { defaultChapters, subjectLabels } from './data/chapters';
 import { useTimer } from './hooks/useTimer';
 import { getCompletionStats } from './lib/stats';
 
+
+const getTimeOfDayTheme = (date = new Date()) => {
+  const hour = date.getHours();
+
+  if (hour >= 5 && hour < 11) {
+    return 'morning';
+  }
+
+  if (hour >= 11 && hour < 17) {
+    return 'afternoon';
+  }
+
+  if (hour >= 17 && hour < 20) {
+    return 'evening';
+  }
+
+  return 'night';
+};
+
+const shortcutRows = [
+  ['F', 'Focus Mode'],
+  ['Ctrl/Cmd + K', 'Search Chapters'],
+  ['D', 'Dashboard'],
+  ['S', 'Study Planner'],
+  ['?', 'Show Shortcuts'],
+  ['Esc', 'Close'],
+];
+
 export default function App() {
   const [activeView, setActiveView] = useState('dashboard');
   const [activeSubject, setActiveSubject] = useState('physics');
@@ -24,7 +52,9 @@ export default function App() {
   const [highlightedChapterId, setHighlightedChapterId] = useState(null);
   const [isFocusMode, setIsFocusMode] = useState(false);
   const [showShortcutHelp, setShowShortcutHelp] = useState(false);
+  const [timeOfDayTheme, setTimeOfDayTheme] = useState(() => getTimeOfDayTheme());
   const searchInputRef = useRef(null);
+  const shortcutCloseButtonRef = useRef(null);
 
   const activeChapters = defaultChapters[activeSubject];
   const activeProgress = plannerData.subjects[activeSubject];
@@ -86,6 +116,20 @@ export default function App() {
   };
 
   useEffect(() => {
+    const updateTheme = () => setTimeOfDayTheme(getTimeOfDayTheme());
+    updateTheme();
+    const themeIntervalId = window.setInterval(updateTheme, 60 * 1000);
+
+    return () => window.clearInterval(themeIntervalId);
+  }, []);
+
+  useEffect(() => {
+    if (showShortcutHelp) {
+      window.setTimeout(() => shortcutCloseButtonRef.current?.focus(), 0);
+    }
+  }, [showShortcutHelp]);
+
+  useEffect(() => {
     const isTypingTarget = (target) => ['INPUT', 'TEXTAREA', 'SELECT'].includes(target?.tagName) || target?.isContentEditable;
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') {
@@ -105,9 +149,18 @@ export default function App() {
         setShowShortcutHelp(true);
         return;
       }
-      if (event.key.toLowerCase() === 'f') setIsFocusMode(true);
-      if (event.key.toLowerCase() === 'd') setActiveView('dashboard');
-      if (event.key.toLowerCase() === 's') setActiveView('study');
+      if (event.key.toLowerCase() === 'f') {
+        event.preventDefault();
+        setIsFocusMode((current) => !current);
+      }
+      if (event.key.toLowerCase() === 'd') {
+        event.preventDefault();
+        setActiveView('dashboard');
+      }
+      if (event.key.toLowerCase() === 's') {
+        event.preventDefault();
+        setActiveView('study');
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
@@ -136,9 +189,11 @@ export default function App() {
     }, 1600);
   };
 
+  const appThemeClass = `app-shell app-theme-${timeOfDayTheme}`;
+
   if (isFocusMode) {
     return (
-      <main className="min-h-screen bg-canvas text-ink">
+      <main className={`${appThemeClass} min-h-screen text-ink`}>
         <div className="flex min-h-screen items-center justify-center px-8">
           <section className="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-border bg-paper p-10 text-center shadow-card">
             <div className="botanical-left" aria-hidden="true" />
@@ -167,7 +222,7 @@ export default function App() {
   }
 
   return (
-    <main className="min-h-screen bg-canvas px-8 py-8 text-ink">
+    <main className={`${appThemeClass} min-h-screen px-8 py-8 text-ink`}>
       <section className="mx-auto max-w-7xl">
         <div className="mb-6">
           <h1 className="text-3xl font-bold tracking-tight text-ink">JEE Planner</h1>
@@ -242,10 +297,33 @@ export default function App() {
         </div>
       </section>
       {showShortcutHelp ? (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-ink/20 px-4 backdrop-blur-sm" role="dialog" aria-modal="true">
-          <div className="w-full max-w-sm rounded-2xl border border-border bg-paper p-6 shadow-card">
-            <div className="flex items-center justify-between"><h2 className="text-lg font-semibold text-ink">Keyboard shortcuts</h2><button type="button" onClick={() => setShowShortcutHelp(false)} className="rounded-lg p-2 text-ink-muted hover:bg-sky-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600"><X className="h-4 w-4" /></button></div>
-            <dl className="mt-5 space-y-3 text-sm"><div className="flex justify-between"><dt>Focus Mode</dt><dd className="font-semibold">F</dd></div><div className="flex justify-between"><dt>Search</dt><dd className="font-semibold">Ctrl K</dd></div><div className="flex justify-between"><dt>Dashboard</dt><dd className="font-semibold">D</dd></div><div className="flex justify-between"><dt>Study Planner</dt><dd className="font-semibold">S</dd></div><div className="flex justify-between"><dt>Close</dt><dd className="font-semibold">ESC</dd></div></dl>
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-ink/20 px-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="shortcut-help-title"
+        >
+          <div className="w-full max-w-md rounded-2xl border border-white/70 bg-white/80 p-6 shadow-card backdrop-blur-md">
+            <div className="flex items-center justify-between gap-4">
+              <h2 id="shortcut-help-title" className="text-lg font-semibold text-ink">Keyboard shortcuts</h2>
+              <button
+                type="button"
+                ref={shortcutCloseButtonRef}
+                onClick={() => setShowShortcutHelp(false)}
+                className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-lg text-ink-muted transition hover:bg-sky-50 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2"
+                aria-label="Close keyboard shortcuts"
+              >
+                <X className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </div>
+            <dl className="mt-5 space-y-3 text-sm">
+              {shortcutRows.map(([keyLabel, description]) => (
+                <div key={keyLabel} className="flex items-center justify-between gap-5 rounded-xl border border-border/70 bg-paper/70 px-3 py-2">
+                  <dt className="text-ink-muted">{description}</dt>
+                  <dd className="rounded-lg border border-border bg-canvas px-2.5 py-1 font-semibold text-ink shadow-sm">{keyLabel}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
         </div>
       ) : null}
