@@ -408,3 +408,171 @@ input {
   background: currentColor;
   transform: rotate(-25deg);
 }
+
+:root {
+  --color-ink: 10 10 10;
+  --color-ink-muted: 82 82 91;
+  --color-paper: 250 250 247;
+  --color-canvas: 245 246 242;
+  --color-border: 221 227 215;
+  --color-ember-50: 254 242 242;
+  --color-ember-600: 220 38 38;
+  --color-ember-700: 185 28 28;
+  --color-sky-50: 240 249 255;
+  --color-sky-500: 14 165 233;
+  --color-sky-600: 2 132 199;
+  --color-sage-50: 244 247 241;
+  --color-sage-100: 234 240 227;
+  --color-sage-200: 221 230 213;
+  --color-sage-300: 198 212 185;
+  --color-sage-500: 142 163 122;
+  --color-sage-700: 95 113 79;
+  --color-sage-800: 70 86 58;
+  --shadow-card: 0 1px 1px rgba(75,85,58,0.035), 0 10px 30px rgba(75,85,58,0.085);
+  --shadow-card-hover: 0 2px 8px rgba(75,85,58,0.07), 0 18px 42px rgba(75,85,58,0.11);
+}
+
+html[data-theme="dark"] {
+  --color-ink: 237 242 238;
+  --color-ink-muted: 185 198 191;
+  --color-paper: 27 36 32;
+  --color-canvas: 15 19 17;
+  --color-border: 47 64 56;
+  --color-ember-50: 69 30 30;
+  --color-ember-600: 239 68 68;
+  --color-ember-700: 248 113 113;
+  --color-sky-50: 24 48 62;
+  --color-sky-500: 56 189 248;
+  --color-sky-600: 125 211 252;
+  --color-sage-50: 31 48 40;
+  --color-sage-100: 37 58 48;
+  --color-sage-200: 54 82 68;
+  --color-sage-300: 80 115 96;
+  --color-sage-500: 126 157 133;
+  --color-sage-700: 163 190 164;
+  --color-sage-800: 195 215 196;
+  --shadow-card: 0 1px 0 rgba(237,242,238,0.035), 0 14px 34px rgba(0,0,0,0.28);
+  --shadow-card-hover: 0 1px 0 rgba(237,242,238,0.05), 0 18px 42px rgba(0,0,0,0.34);
+  color: rgb(var(--color-ink));
+  background: #0f1311;
+}
+
+html[data-theme="dark"] body,
+html[data-theme="dark"] .app-shell,
+html[data-theme="dark"] .app-theme-morning,
+html[data-theme="dark"] .app-theme-afternoon,
+html[data-theme="dark"] .app-theme-evening,
+html[data-theme="dark"] .app-theme-night {
+  background: linear-gradient(180deg, #0f1311 0%, #151b18 100%);
+}
+
+html[data-theme="dark"] * {
+  scrollbar-color: #3d5148 #151b18;
+}
+
+html[data-theme="dark"] *::-webkit-scrollbar-track { background: #151b18; }
+html[data-theme="dark"] *::-webkit-scrollbar-thumb { background: #3d5148; border-color: #151b18; }
+
+html[data-theme="dark"] .bg-white,
+html[data-theme="dark"] .bg-stone-50,
+html[data-theme="dark"] .bg-\[\#FBFAF0\]\/75,
+html[data-theme="dark"] .bg-\[\#F3F6EA\]\/85,
+html[data-theme="dark"] .bg-white\/65,
+html[data-theme="dark"] .bg-white\/70,
+html[data-theme="dark"] .bg-white\/75 {
+  background-color: rgb(var(--color-paper) / 0.96) !important;
+}
+
+html[data-theme="dark"] .hover\:bg-sky-50:hover,
+html[data-theme="dark"] .group:hover .group-hover\:bg-sky-50,
+html[data-theme="dark"] .hover\:bg-paper:hover {
+  background-color: #222d28 !important;
+}
+
+html[data-theme="dark"] .dashboard-view {
+  background:
+    radial-gradient(circle at 84% 4%, rgba(125, 211, 252, 0.055), transparent 28rem),
+    radial-gradient(circle at 8% 14%, rgba(126, 157, 133, 0.08), transparent 24rem),
+    linear-gradient(180deg, rgba(15, 19, 17, 0.98), rgba(21, 27, 24, 0.98));
+}
+
+html[data-theme="dark"] .dashboard-view::before {
+  opacity: 0.24;
+  background-image:
+    linear-gradient(90deg, rgba(185, 198, 191, 0.035) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(185, 198, 191, 0.026) 1px, transparent 1px),
+    radial-gradient(circle at 30% 20%, rgba(185, 198, 191, 0.18) 0 1px, transparent 1.5px);
+  mix-blend-mode: normal;
+}
+
+html[data-theme="dark"] .dashboard-orbits,
+html[data-theme="dark"] .dashboard-leaves,
+html[data-theme="dark"] .dashboard-botanical,
+html[data-theme="dark"] .dashboard-equation,
+html[data-theme="dark"] .dashboard-hero-equations,
+html[data-theme="dark"] .dashboard-hero-illustration,
+html[data-theme="dark"] .botanical-left {
+  opacity: 0.035;
+  color: #a3bea4;
+}
+
+html[data-theme="dark"] .dashboard-card,
+html[data-theme="dark"] .dashboard-card-subtle,
+html[data-theme="dark"] .dashboard-hero {
+  border-color: rgb(var(--color-border) / 0.9);
+  background: linear-gradient(180deg, rgba(34, 45, 40, 0.74), rgba(27, 36, 32, 0.97)), #1b2420;
+  box-shadow: var(--shadow-card);
+}
+
+html[data-theme="dark"] .dashboard-card-subtle {
+  background: linear-gradient(180deg, rgba(34, 45, 40, 0.92), rgba(27, 36, 32, 0.96)), #222d28;
+}
+
+html[data-theme="dark"] .dashboard-hero {
+  background:
+    radial-gradient(circle at 88% 8%, rgba(125, 211, 252, 0.055), transparent 18rem),
+    radial-gradient(circle at 56% 44%, rgba(126, 157, 133, 0.08), transparent 18rem),
+    linear-gradient(135deg, rgba(34, 45, 40, 0.96), rgba(21, 27, 24, 0.98));
+}
+
+html[data-theme="dark"] .progress-ring-sage { filter: none; }
+html[data-theme="dark"] .timer-signature-active { text-shadow: none; }
+
+html[data-theme="dark"] .progress-bar-sage {
+  background: linear-gradient(90deg, #516d5b 0%, #7e9d85 52%, #a3bea4 100%);
+  box-shadow: none;
+}
+
+html[data-theme="dark"] .bg-\[\#DDE6D0\],
+html[data-theme="dark"] .bg-\[\#E6EEDC\]\/85 {
+  background-color: #22342b !important;
+}
+
+html[data-theme="dark"] .bg-\[\#7C8056\] { background-color: #394d40 !important; }
+
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea {
+  background-color: #151b18;
+  color: rgb(var(--color-ink));
+  border-color: rgb(var(--color-border));
+}
+
+html[data-theme="dark"] ::placeholder { color: #8fa098; }
+
+html[data-theme="dark"] thead,
+html[data-theme="dark"] th,
+html[data-theme="dark"] td {
+  box-shadow: none !important;
+}
+
+html[data-theme="dark"] .border-white\/70 { border-color: rgb(var(--color-border) / 0.9) !important; }
+
+html[data-theme="dark"] .focus-visible\:ring-offset-2:focus-visible { --tw-ring-offset-color: #0f1311; }
+
+html[data-theme="dark"] .border-amber-100 { border-color: #5f4a22 !important; }
+html[data-theme="dark"] .bg-amber-50 { background-color: #3d3018 !important; }
+html[data-theme="dark"] .text-amber-600 { color: #fbbf24 !important; }
+
+html[data-theme="dark"] .text-stone-400 { color: #8fa098 !important; }
+html[data-theme="dark"] .disabled\:bg-stone-300:disabled { background-color: #3b4540 !important; }

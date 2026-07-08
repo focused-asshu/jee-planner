@@ -9,6 +9,7 @@ import { ViewTabs } from './components/ViewTabs';
 import { defaultChapters, subjectLabels } from './data/chapters';
 import { useTimer } from './hooks/useTimer';
 import { getCompletionStats } from './lib/stats';
+import { getStoredThemePreference, persistThemePreference, resolveThemePreference } from './lib/theme';
 
 
 const getTimeOfDayTheme = (date = new Date()) => {
@@ -55,6 +56,8 @@ export default function App() {
   const [isFocusMode, setIsFocusMode] = useState(false);
   const [showShortcutHelp, setShowShortcutHelp] = useState(false);
   const [timeOfDayTheme, setTimeOfDayTheme] = useState(() => getTimeOfDayTheme());
+  const [themePreference, setThemePreference] = useState(() => getStoredThemePreference());
+  const [resolvedTheme, setResolvedTheme] = useState(() => resolveThemePreference(getStoredThemePreference()));
   const searchInputRef = useRef(null);
   const shortcutCloseButtonRef = useRef(null);
 
@@ -126,6 +129,27 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const updateResolvedTheme = () => setResolvedTheme(resolveThemePreference(themePreference));
+    updateResolvedTheme();
+    if (themePreference === 'system') {
+      mediaQuery.addEventListener('change', updateResolvedTheme);
+      return () => mediaQuery.removeEventListener('change', updateResolvedTheme);
+    }
+    return undefined;
+  }, [themePreference]);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = resolvedTheme;
+    document.documentElement.style.colorScheme = resolvedTheme;
+  }, [resolvedTheme]);
+
+  const handleThemePreferenceChange = (preference) => {
+    setThemePreference(preference);
+    persistThemePreference(preference);
+  };
+
+  useEffect(() => {
     if (showShortcutHelp) {
       window.setTimeout(() => shortcutCloseButtonRef.current?.focus(), 0);
     }
@@ -191,7 +215,7 @@ export default function App() {
     }, 1600);
   };
 
-  const appThemeClass = `app-shell app-theme-${timeOfDayTheme}`;
+  const appThemeClass = `app-shell app-theme-${timeOfDayTheme} app-color-${resolvedTheme}`;
 
   if (isFocusMode) {
     return (
@@ -239,7 +263,7 @@ export default function App() {
           {activeView === 'dashboard' ? (
             <Dashboard plannerData={plannerData} completionStats={completionStats} />
           ) : activeView === 'settings' ? (
-            <CloudBackupCard plannerData={plannerData} onRestoreComplete={replacePlannerData} />
+            <CloudBackupCard plannerData={plannerData} onRestoreComplete={replacePlannerData} themePreference={themePreference} onThemePreferenceChange={handleThemePreferenceChange} />
           ) : (
             <>
               <SubjectTabs activeSubject={activeSubject} onSubjectChange={handleSubjectChange} />

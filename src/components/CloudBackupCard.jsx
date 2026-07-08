@@ -57,7 +57,7 @@ const getBackupStatusLabel = ({ online, isSaving, lastError, dirty }) => {
   if (dirty) return 'Unsaved changes — autosave pending';
   return '✓ All changes saved';
 };
-export function CloudBackupCard({ plannerData, onRestoreComplete }) {
+export function CloudBackupCard({ plannerData, onRestoreComplete, themePreference = 'system', onThemePreferenceChange }) {
   const [profile, setProfile] = useState(() => getGoogleProfile());
   const [settings, setSettings] = useState(() => getCloudBackupSettings());
   const [statusMessage, setStatusMessage] = useState('');
@@ -259,6 +259,33 @@ export function CloudBackupCard({ plannerData, onRestoreComplete }) {
         <span className={`rounded-full px-3 py-1 text-xs font-semibold ${isConnected ? 'bg-sky-50 text-sky-700' : 'bg-canvas text-ink-muted'}`}>
           {online ? (isConnected ? 'Connected' : 'Not Connected') : 'Offline'}
         </span>
+      </div>
+
+
+      <div className="mt-6 rounded-2xl border border-border bg-white p-4">
+        <div>
+          <h3 className="text-base font-bold text-ink">Theme</h3>
+          <p className="mt-1 text-xs text-ink-muted">Choose the botanical light theme, premium research-lab dark theme, or follow your device.</p>
+        </div>
+        <div className="mt-4 grid gap-2 sm:grid-cols-3" role="radiogroup" aria-label="Theme preference">
+          {[
+            { id: 'light', label: '☀ Light' },
+            { id: 'dark', label: '🌙 Dark' },
+            { id: 'system', label: '💻 System' },
+          ].map((option) => (
+            <label key={option.id} className={`flex cursor-pointer items-center justify-center rounded-xl border px-3 py-2 text-sm font-semibold transition focus-within:ring-2 focus-within:ring-sky-600 ${themePreference === option.id ? 'border-ember-600 bg-ember-50 text-ember-700' : 'border-border bg-canvas text-ink-muted hover:bg-sky-50 hover:text-ink'}`}>
+              <input
+                type="radio"
+                name="theme-preference"
+                value={option.id}
+                checked={themePreference === option.id}
+                onChange={() => onThemePreferenceChange?.(option.id)}
+                className="sr-only"
+              />
+              {option.label}
+            </label>
+          ))}
+        </div>
       </div>
 
       <div className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
