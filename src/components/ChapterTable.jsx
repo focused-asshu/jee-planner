@@ -12,8 +12,8 @@ export function ChapterTable({
   highlightedChapterId,
 }) {
   return (
-    <div className="max-h-[calc(100vh-320px)] overflow-auto rounded-xl border border-border bg-paper shadow-card">
-      <table className="w-full min-w-[1080px] border-separate border-spacing-0 text-left">
+    <div className="max-h-[calc(100vh-320px)] overflow-auto overscroll-x-contain rounded-xl border border-border bg-paper shadow-card sm:max-h-[calc(100vh-320px)] max-sm:max-h-none">
+      <table className="w-full min-w-[920px] border-separate border-spacing-0 text-left">
         <thead className="sticky top-0 z-10 bg-canvas text-xs uppercase tracking-wide text-ink-muted shadow-[0_1px_0_0_#E7E5E4]">
           <tr className="border-b border-border">
             <th className="sticky left-0 z-20 bg-canvas px-4 py-3 font-semibold shadow-[1px_0_0_0_#E7E5E4]">

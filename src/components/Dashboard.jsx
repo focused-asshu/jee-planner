@@ -27,7 +27,7 @@ function StatCard({ label, value, helper, Icon, tone = 'neutral', empty = false 
   const iconTone = tone === 'ember' ? 'bg-ember-50 text-ember-700' : tone === 'sage' ? 'bg-sage-50 text-sage-700' : 'bg-sky-50 text-sky-600';
 
   return (
-    <div className="relative overflow-hidden dashboard-card p-6 transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-card-hover">
+    <div className="relative overflow-hidden dashboard-card p-4 transition duration-150 ease-out md:p-6 md:hover:-translate-y-0.5">
       {empty ? <BotanicalCorner /> : null}
       <div className="relative flex items-start justify-between gap-3">
         <p className="text-sm font-medium text-ink-muted">{label}</p>
@@ -157,7 +157,7 @@ function StudyHeatmap({ dailySessions }) {
   const hasStudySessions = useMemo(() => Object.values(dailySessions ?? {}).some((session) => Math.max(0, Math.floor(session?.totalSeconds ?? 0)) > 0), [dailySessions]);
 
   return (
-    <section className="dashboard-card p-6">
+    <section className="dashboard-card p-4 md:p-6">
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h3 className="text-base font-semibold text-ink">Study Heatmap</h3>
@@ -181,7 +181,7 @@ function StudyHeatmap({ dailySessions }) {
             <div className="grid grid-rows-7 gap-[3px] pr-1 text-[10px] font-medium leading-3 text-stone-400">
               {weekdayLabels.map((day, index) => <span key={`${day}-${index}`} className="h-3 tabular-nums">{day}</span>)}
             </div>
-            <div className="flex gap-[3px]" role="grid" aria-label="Study heatmap for the last 180 days including today">
+            <div className="min-w-max flex gap-[3px]" role="grid" aria-label="Study heatmap for the last 180 days including today">
               {weeks.map((week, weekIndex) => (
                 <div key={week[0]?.dateKey ?? weekIndex} className="grid grid-rows-7 gap-[3px]" role="row">
                   {week.map((cell) => {
@@ -238,7 +238,7 @@ function MilestonesCard({ plannerData }) {
   const hasAnyMilestoneProgress = milestones.unlocked.length > 0 || nextMilestones.some((milestone) => milestone.progress > 0);
 
   return (
-    <section className="dashboard-card p-6">
+    <section className="dashboard-card p-4 md:p-6">
       <div className="mb-5 flex items-start justify-between gap-3">
         <div>
           <h3 className="text-base font-semibold text-ink">Milestones</h3>
@@ -309,7 +309,7 @@ function StudyInsights({ plannerData }) {
   const hasInsightData = weakChapters.length > 0 || mostStudied.length > 0 || recentlyFinished.length > 0 || Object.values(subjectBalance.totals).some((seconds) => seconds > 0) || consistency.studiedLastSevenDays > 0;
 
   return (
-    <section className="dashboard-card p-6">
+    <section className="dashboard-card p-4 md:p-6">
       <div className="mb-5 flex items-start justify-between gap-3">
         <div>
           <h3 className="text-base font-semibold text-ink">Study Insights</h3>
@@ -558,16 +558,16 @@ export function Dashboard({ plannerData }) {
   const currentStreak = liveInProgressSecondsToday > 0 && todayCommittedSeconds === 0 ? committedStreaks.currentStreak + 1 : committedStreaks.currentStreak;
 
   return (
-    <div className="relative overflow-hidden p-7 dashboard-view">
+    <div className="relative overflow-hidden p-3 dashboard-view sm:p-5 lg:p-7">
       <DashboardAtmosphere />
       <BotanicalCorner />
-      <section className="dashboard-hero relative mb-5 overflow-hidden rounded-[2rem] px-7 py-6">
+      <section className="dashboard-hero relative mb-4 overflow-hidden rounded-[1.25rem] px-4 py-5 md:mb-5 md:rounded-[2rem] md:px-7 md:py-6">
         <div className="dashboard-hero-orbit" aria-hidden="true" />
         <div className="relative flex flex-wrap items-end justify-between gap-5">
           <div className="max-w-3xl">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sage-700/80">Dashboard · Botanical physics journal</p>
-            <h2 className="mt-2 text-[2.85rem] font-semibold leading-[1.02] tracking-[-0.055em] text-ink">{getGreeting()}</h2>
-            <p className="mt-3 max-w-2xl text-base leading-7 text-ink-muted">{motivationalLines[getDayIndex(motivationalLines.length)]}</p>
+            <h2 className="mt-2 text-3xl font-semibold leading-tight tracking-[-0.04em] text-ink md:text-[2.85rem] md:leading-[1.02] md:tracking-[-0.055em]">{getGreeting()}</h2>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-ink-muted md:text-base md:leading-7">{motivationalLines[getDayIndex(motivationalLines.length)]}</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <div className="rounded-full border border-sage-700/[0.14] bg-[#F3F6EA]/85 px-4 py-2 text-sm font-semibold text-sage-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">JEE Main 2027 · {daysRemaining} days</div>
@@ -577,14 +577,14 @@ export function Dashboard({ plannerData }) {
       </section>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <div className="dashboard-card p-6 lg:col-span-2">
+        <div className="dashboard-card p-4 md:p-6 lg:col-span-2">
           <div className="flex items-start justify-between gap-4"><div><h3 className="text-base font-semibold text-ink">{JEE_MAIN_EXAM.label}</h3><p className="mt-2 text-3xl font-bold tabular-nums text-ink">{daysRemaining} Days Remaining</p></div><CircularProgress percent={overallPercent} label="Syllabus" /></div>
           <div className="mt-5 h-2.5 overflow-hidden rounded-full bg-[#E9EDE5]"><div className="h-full rounded-full bg-ember-600 transition-[width] duration-500 ease-out" style={{ width: `${countdownPercent}%` }} /></div>
         </div>
-        <div className="dashboard-card p-6"><h3 className="text-base font-semibold text-ink">Today's Mission</h3><ul className="mt-4 space-y-3">{missionItems.map((item) => <li key={item} className="flex items-center gap-3 text-sm text-ink"><span className="h-2 w-2 rounded-full bg-sage-500" />{item}</li>)}</ul></div>
+        <div className="dashboard-card p-4 md:p-6"><h3 className="text-base font-semibold text-ink">Today's Mission</h3><ul className="mt-4 space-y-3">{missionItems.map((item) => <li key={item} className="flex items-center gap-3 text-sm text-ink"><span className="h-2 w-2 rounded-full bg-sage-500" />{item}</li>)}</ul></div>
       </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5 lg:gap-4">
         <StatCard label="Total Chapters Completed" value={`${completionStats.completed} / ${completionStats.total}`} helper="Across Physics, Chemistry, and Maths" Icon={CheckCircle2} tone="sage" />
         <StatCard label="Total Study Hours" value={formatStudyTime(totalStudySeconds)} helper="Committed time plus active timer" Icon={Clock} />
         <StatCard label="Today's Study Time" value={todayStudySeconds > 0 ? formatStudyTime(todayStudySeconds) : 'Fresh start'} helper={todayStudySeconds > 0 ? "Committed sessions plus today's active timer" : 'Begin with one quiet timer session.'} Icon={Hourglass} empty={todayStudySeconds === 0} />
@@ -614,11 +614,11 @@ export function Dashboard({ plannerData }) {
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[1fr_320px]">
-        <div className="dashboard-card p-6">
+        <div className="dashboard-card p-4 md:p-6">
           <div className="mb-4"><h3 className="text-base font-semibold text-ink">Subject Progress</h3><p className="mt-1 text-sm text-ink-muted">Completion by subject, using the same criteria as the Study Planner.</p></div>
           <div className="space-y-4">{Object.entries(completionStats.bySubject).map(([subject, stats]) => { const percent = stats.total > 0 ? (stats.completed / stats.total) * 100 : 0; return <div key={subject}><div className="mb-2 flex items-center justify-between text-sm"><span className="font-medium text-ink">{subjectLabels[subject]}</span><span className="tabular-nums text-ink-muted">{stats.completed} / {stats.total} chapters</span></div><div className="h-3 overflow-hidden rounded-full bg-[#E9EDE5]"><div className="h-full rounded-full bg-ember-600 transition-[width] duration-500 ease-out" style={{ width: `${percent}%` }} /></div></div>; })}</div>
         </div>
-        <div className="relative overflow-hidden dashboard-card p-6"><BotanicalCorner /><Search className="h-5 w-5 text-sky-600" aria-hidden="true" /><p className="relative mt-5 text-lg font-semibold leading-relaxed text-ink">“{studyQuotes[getDayIndex(studyQuotes.length)]}”</p><p className="relative mt-3 text-xs font-medium uppercase tracking-wide text-ink-muted">Daily study note</p></div>
+        <div className="relative overflow-hidden dashboard-card p-4 md:p-6"><BotanicalCorner /><Search className="h-5 w-5 text-sky-600" aria-hidden="true" /><p className="relative mt-5 text-lg font-semibold leading-relaxed text-ink">“{studyQuotes[getDayIndex(studyQuotes.length)]}”</p><p className="relative mt-3 text-xs font-medium uppercase tracking-wide text-ink-muted">Daily study note</p></div>
       </div>
     </div>
   );
