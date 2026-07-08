@@ -147,3 +147,178 @@ input {
     transition-duration: 0.001ms !important;
   }
 }
+
+.dashboard-view {
+  isolation: isolate;
+}
+
+.dashboard-view > :not(.dashboard-atmosphere) {
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard-atmosphere {
+  z-index: 0;
+  opacity: 0.9;
+}
+
+.dashboard-light {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(18px);
+  transform: translateZ(0);
+}
+
+.dashboard-light-one {
+  top: 1.5rem;
+  left: 11%;
+  height: 18rem;
+  width: 18rem;
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.14), rgba(251, 191, 36, 0.035) 48%, transparent 72%);
+}
+
+.dashboard-light-two {
+  right: 4%;
+  top: 18rem;
+  height: 24rem;
+  width: 24rem;
+  background: radial-gradient(circle, rgba(142, 163, 122, 0.13), rgba(142, 163, 122, 0.035) 48%, transparent 74%);
+}
+
+.dashboard-particle-field {
+  position: absolute;
+  inset: 0;
+  opacity: 0.28;
+  background-image:
+    radial-gradient(circle, rgba(95, 113, 79, 0.28) 0 1px, transparent 1.4px),
+    radial-gradient(circle, rgba(2, 132, 199, 0.13) 0 1px, transparent 1.6px),
+    radial-gradient(circle, rgba(220, 38, 38, 0.08) 0 0.9px, transparent 1.4px);
+  background-position: 16px 20px, 88px 54px, 44px 100px;
+  background-size: 92px 92px, 138px 138px, 176px 176px;
+  mask-image: linear-gradient(to bottom, transparent, black 7%, black 86%, transparent);
+}
+
+.dashboard-orbits {
+  position: absolute;
+  color: #5F714F;
+  overflow: visible;
+}
+
+.dashboard-orbits-hero {
+  top: 3.5rem;
+  right: 7rem;
+  width: min(38rem, 44vw);
+  opacity: 0.16;
+}
+
+.dashboard-orbit-line,
+.dashboard-arc-line,
+.dashboard-atom-ring,
+.dashboard-stem {
+  stroke: currentColor;
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.dashboard-orbit-line,
+.dashboard-atom-ring {
+  stroke-dasharray: 9 12;
+}
+
+.dashboard-orbit-line-soft {
+  opacity: 0.56;
+}
+
+.dashboard-arc-line {
+  opacity: 0.5;
+  stroke-dasharray: 2 10;
+}
+
+.dashboard-orbit-dot,
+.dashboard-atom-core {
+  fill: currentColor;
+}
+
+.dashboard-orbit-dot-muted {
+  opacity: 0.58;
+}
+
+.dashboard-atom-mark {
+  position: absolute;
+  top: 5.15rem;
+  left: 18.5rem;
+  width: 4.5rem;
+  color: #8EA37A;
+  opacity: 0.18;
+  overflow: visible;
+}
+
+.dashboard-leaves {
+  position: absolute;
+  color: #5F714F;
+  overflow: visible;
+}
+
+.dashboard-leaves-top {
+  right: -1.5rem;
+  top: -0.5rem;
+  width: 17rem;
+  opacity: 0.105;
+}
+
+.dashboard-vine-bottom {
+  bottom: 20rem;
+  left: -1.25rem;
+  width: 18rem;
+  opacity: 0.09;
+}
+
+.dashboard-leaf {
+  fill: currentColor;
+}
+
+.dashboard-stem {
+  fill: none;
+  opacity: 0.78;
+  stroke-width: 2;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dashboard-light-one,
+  .dashboard-light-two {
+    animation: dashboard-light-breathe 9s ease-in-out infinite;
+  }
+
+  .dashboard-orbits-hero {
+    animation: dashboard-orbit-shimmer 16s ease-in-out infinite;
+  }
+
+  .dashboard-particle-field {
+    animation: dashboard-particle-drift 24s linear infinite;
+  }
+}
+
+@keyframes dashboard-light-breathe {
+  0%, 100% { opacity: 0.82; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.025); }
+}
+
+@keyframes dashboard-orbit-shimmer {
+  0%, 100% { opacity: 0.13; transform: translateY(0); }
+  50% { opacity: 0.18; transform: translateY(-2px); }
+}
+
+@keyframes dashboard-particle-drift {
+  from { background-position: 16px 20px, 88px 54px, 44px 100px; }
+  to { background-position: 16px 112px, 88px 192px, 44px 276px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-light-one,
+  .dashboard-light-two,
+  .dashboard-orbits-hero,
+  .dashboard-particle-field {
+    animation: none !important;
+  }
+}
