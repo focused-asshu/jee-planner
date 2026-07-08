@@ -1,9 +1,9 @@
 const PLANT_STAGES = [
-  { name: 'Seed', minHours: 0, nextHours: 5, line: 'Every strong garden begins quietly.' },
-  { name: 'Sprout', minHours: 5, nextHours: 25, line: 'Your effort is starting to show.' },
-  { name: 'Small Plant', minHours: 25, nextHours: 75, line: 'Steady study is building roots.' },
-  { name: 'Growing Plant', minHours: 75, nextHours: 150, line: 'Your consistency is growing tall.' },
-  { name: 'Mature Plant', minHours: 150, nextHours: null, line: 'Your plant is thriving with your effort.' },
+  { name: 'Starting Point', minHours: 0, nextHours: 5, line: 'Every strong preparation begins quietly.' },
+  { name: 'Steady Start', minHours: 5, nextHours: 25, line: 'Your effort is starting to show.' },
+  { name: 'Consistent Rhythm', minHours: 25, nextHours: 75, line: 'Steady study is building a stronger base.' },
+  { name: 'Focused Momentum', minHours: 75, nextHours: 150, line: 'Your consistency is gaining momentum.' },
+  { name: 'Deep Focus', minHours: 150, nextHours: null, line: 'Your preparation is thriving with sustained effort.' },
 ];
 
 const getPlantStage = (studyHours) => {
@@ -45,7 +45,7 @@ function PlantIllustration({ stageName }) {
 export function PlantCompanion({ totalStudySeconds }) {
   const studyHours = Math.max(0, totalStudySeconds ?? 0) / 3600;
   const stage = getPlantStage(studyHours);
-  const nextMilestone = stage.nextHours === null ? 'Fully grown' : `${stage.nextHours}h milestone`;
+  const nextMilestone = stage.nextHours === null ? 'Complete' : `${stage.nextHours}h milestone`;
   const remainingHours = stage.nextHours === null ? null : Math.max(0, stage.nextHours - studyHours);
 
   return (
@@ -53,9 +53,9 @@ export function PlantCompanion({ totalStudySeconds }) {
       <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-sage-200/40" />
       <div className="relative flex items-center justify-between gap-5">
         <div>
-          <p className="text-sm font-medium text-sage-700">Plant Companion</p>
+          <p className="text-sm font-medium text-sage-700">Study Companion</p>
           <h3 className="mt-1 text-2xl font-bold text-ink">{stage.name}</h3>
-          <p className="mt-2 text-sm text-ink-muted">Your plant is growing with your effort.</p>
+          <p className="mt-2 text-sm text-ink-muted">A light botanical marker for your study hours.</p>
           <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
             <div className="rounded-xl border border-sage-700/[0.12] bg-[#F7FAEF]/70 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
               <p className="text-xs text-ink-muted">Total study</p>
@@ -66,7 +66,7 @@ export function PlantCompanion({ totalStudySeconds }) {
               <p className="mt-1 font-semibold text-ink">{nextMilestone}</p>
             </div>
           </div>
-          {remainingHours !== null ? <p className="mt-3 text-xs text-sage-700">{formatHours(remainingHours)} to the next growth stage.</p> : null}
+          {remainingHours !== null ? <p className="mt-3 text-xs text-sage-700">{formatHours(remainingHours)} to the next study milestone.</p> : null}
           <p className="mt-3 text-xs text-ink-muted">{stage.line}</p>
         </div>
         <PlantIllustration stageName={stage.name} />

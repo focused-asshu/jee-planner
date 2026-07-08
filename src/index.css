@@ -295,6 +295,41 @@ input {
   stroke-width: 5;
 }
 
+.dashboard-flower {
+  position: absolute;
+  pointer-events: none;
+  overflow: visible;
+  opacity: 0.24;
+}
+
+.dashboard-flower-top {
+  top: 1.5rem;
+  right: 0.9rem;
+  width: 2.3rem;
+}
+
+.dashboard-flower-bottom {
+  bottom: 2rem;
+  left: 1rem;
+  width: 2.6rem;
+}
+
+.dashboard-flower-petal-white {
+  fill: #fffef7;
+  stroke: rgba(82, 104, 66, 0.16);
+  stroke-width: 0.8;
+}
+
+.dashboard-flower-petal-yellow {
+  fill: #f6d979;
+  stroke: rgba(82, 104, 66, 0.14);
+  stroke-width: 0.8;
+}
+
+.dashboard-flower-center {
+  fill: #c9a447;
+}
+
 .dashboard-card,
 .dashboard-card-subtle {
   border-color: var(--garden-border);
@@ -504,6 +539,7 @@ html[data-theme="dark"] .dashboard-botanical,
 html[data-theme="dark"] .dashboard-equation,
 html[data-theme="dark"] .dashboard-hero-equations,
 html[data-theme="dark"] .dashboard-hero-illustration,
+html[data-theme="dark"] .dashboard-flower,
 html[data-theme="dark"] .botanical-left {
   opacity: 0.035;
   color: #a3bea4;
