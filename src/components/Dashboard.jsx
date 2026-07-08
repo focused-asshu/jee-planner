@@ -37,8 +37,8 @@ function CircularProgress({ percent, label }) {
   return (
     <div className="flex items-center gap-4 rounded-2xl border border-border/80 bg-paper/80 p-4">
       <svg className="h-24 w-24 -rotate-90" viewBox="0 0 100 100" aria-hidden="true">
-        <circle cx="50" cy="50" r={radius} stroke="currentColor" strokeWidth="8" className="text-[#E9EDE5]" fill="none" />
-        <circle cx="50" cy="50" r={radius} stroke="currentColor" strokeWidth="8" className="text-ember-600 progress-ring" fill="none" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={offset} />
+        <circle cx="50" cy="50" r={radius} stroke="currentColor" strokeWidth="8" className="text-[#DDE6D0]" fill="none" />
+        <circle cx="50" cy="50" r={radius} stroke="currentColor" strokeWidth="8" className="text-sage-700 progress-ring progress-ring-sage" fill="none" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={offset} />
       </svg>
       <div>
         <p className="text-sm font-semibold text-ink">{label}</p>
@@ -77,11 +77,11 @@ const getStudyHeatmapIntensity = (seconds) => {
 
 const getStudyHeatmapCellClass = (intensity) => {
   const classes = [
-    'border-sage-200/70 bg-[#E7EDDF]',
-    'border-sage-200 bg-[#DCE8D0]',
-    'border-sage-300 bg-[#BFD0AD]',
-    'border-sage-500 bg-[#91AB7B]',
-    'border-sage-700 bg-[#647A53]',
+    'border-sage-200/70 bg-[#E4EAD9]',
+    'border-sage-200 bg-[#D3E0C6]',
+    'border-sage-300 bg-[#AFC39A]',
+    'border-sage-500 bg-[#7F9868]',
+    'border-sage-700 bg-[#526842]',
   ];
 
   return classes[intensity] ?? classes[0];
@@ -275,8 +275,8 @@ function MilestonesCard({ plannerData }) {
                       <p className="mt-1 text-xs leading-5 text-ink-muted">{milestone.description}</p>
                     </div>
                   </div>
-                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#E9EDE5]" aria-hidden="true">
-                    <div className="h-full rounded-full bg-ember-600 transition-[width] duration-500 ease-out" style={{ width: `${percent}%` }} />
+                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#DDE6D0]" aria-hidden="true">
+                    <div className="h-full rounded-full progress-bar-sage transition-[width] duration-500 ease-out" style={{ width: `${percent}%` }} />
                   </div>
                 </li>
               );
@@ -549,7 +549,9 @@ export function Dashboard({ plannerData }) {
   return (
     <div className="relative overflow-hidden p-3 dashboard-view sm:p-5 lg:p-7">
       <DashboardAtmosphere />
-      <section className="dashboard-hero relative mb-4 overflow-hidden rounded-[1.25rem] px-4 py-5 md:mb-5 md:rounded-[2rem] md:px-7 md:py-6">
+      <section className="dashboard-hero relative mb-5 overflow-hidden rounded-[1.25rem] px-4 py-7 md:mb-6 md:rounded-[2rem] md:px-8 md:py-9">
+        <div className="dashboard-hero-illustration" aria-hidden="true" />
+        <div className="dashboard-hero-equations" aria-hidden="true">∮ B·dl = μ₀I · λ = h/p · ΔE = hν · ∇×E = −∂B/∂t</div>
         <div className="relative flex flex-wrap items-end justify-between gap-5">
           <div className="max-w-3xl">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sage-700/80">Dashboard · Botanical physics journal</p>
@@ -566,7 +568,7 @@ export function Dashboard({ plannerData }) {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="dashboard-card p-4 md:p-6 lg:col-span-2">
           <div className="flex items-start justify-between gap-4"><div><h3 className="text-base font-semibold text-ink">{JEE_MAIN_EXAM.label}</h3><p className="mt-2 text-3xl font-bold tabular-nums text-ink">{daysRemaining} Days Remaining</p></div><CircularProgress percent={overallPercent} label="Syllabus" /></div>
-          <div className="mt-5 h-2.5 overflow-hidden rounded-full bg-[#E9EDE5]"><div className="h-full rounded-full bg-ember-600 transition-[width] duration-500 ease-out" style={{ width: `${countdownPercent}%` }} /></div>
+          <div className="mt-5 h-2.5 overflow-hidden rounded-full bg-[#DDE6D0]"><div className="h-full rounded-full progress-bar-sage transition-[width] duration-500 ease-out" style={{ width: `${countdownPercent}%` }} /></div>
         </div>
         <div className="dashboard-card p-4 md:p-6"><h3 className="text-base font-semibold text-ink">Today's Mission</h3><ul className="mt-4 space-y-3">{missionItems.map((item) => <li key={item} className="flex items-center gap-3 text-sm text-ink"><span className="h-2 w-2 rounded-full bg-sage-500" />{item}</li>)}</ul></div>
       </div>
@@ -579,19 +581,27 @@ export function Dashboard({ plannerData }) {
         <StatCard label="Best Streak" value={formatStreak(committedStreaks.bestStreak)} helper="Longest committed run" Icon={Trophy} tone="ember" />
       </div>
 
-      <div className="mt-6">
+      <div className="dashboard-section-divider" aria-hidden="true"><span /></div>
+
+      <div className="mt-5">
         <StudyHeatmap dailySessions={plannerData.dailySessions} />
       </div>
 
-      <div className="mt-6">
+      <div className="dashboard-section-divider" aria-hidden="true"><span /></div>
+
+      <div className="mt-5">
         <StudyInsights plannerData={plannerData} />
       </div>
 
-      <div className="mt-6">
+      <div className="dashboard-section-divider" aria-hidden="true"><span /></div>
+
+      <div className="mt-5">
         <MilestonesCard plannerData={plannerData} />
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="dashboard-section-divider" aria-hidden="true"><span /></div>
+
+      <div className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
         <Bookshelf plannerData={plannerData} />
         <div className="grid gap-4">
           <DailyJournalCard />
@@ -600,10 +610,12 @@ export function Dashboard({ plannerData }) {
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[1fr_320px]">
+      <div className="dashboard-section-divider" aria-hidden="true"><span /></div>
+
+      <div className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-[1fr_320px]">
         <div className="dashboard-card p-4 md:p-6">
           <div className="mb-4"><h3 className="text-base font-semibold text-ink">Subject Progress</h3><p className="mt-1 text-sm text-ink-muted">Completion by subject, using the same criteria as the Study Planner.</p></div>
-          <div className="space-y-4">{Object.entries(completionStats.bySubject).map(([subject, stats]) => { const percent = stats.total > 0 ? (stats.completed / stats.total) * 100 : 0; return <div key={subject}><div className="mb-2 flex items-center justify-between text-sm"><span className="font-medium text-ink">{subjectLabels[subject]}</span><span className="tabular-nums text-ink-muted">{stats.completed} / {stats.total} chapters</span></div><div className="h-3 overflow-hidden rounded-full bg-[#E9EDE5]"><div className="h-full rounded-full bg-ember-600 transition-[width] duration-500 ease-out" style={{ width: `${percent}%` }} /></div></div>; })}</div>
+          <div className="space-y-4">{Object.entries(completionStats.bySubject).map(([subject, stats]) => { const percent = stats.total > 0 ? (stats.completed / stats.total) * 100 : 0; return <div key={subject}><div className="mb-2 flex items-center justify-between text-sm"><span className="font-medium text-ink">{subjectLabels[subject]}</span><span className="tabular-nums text-ink-muted">{stats.completed} / {stats.total} chapters</span></div><div className="h-3 overflow-hidden rounded-full bg-[#DDE6D0]"><div className="h-full rounded-full progress-bar-sage transition-[width] duration-500 ease-out" style={{ width: `${percent}%` }} /></div></div>; })}</div>
         </div>
         <div className="relative overflow-hidden dashboard-card p-4 md:p-6"><Search className="h-5 w-5 text-sky-600" aria-hidden="true" /><p className="relative mt-5 text-lg font-semibold leading-relaxed text-ink">“{studyQuotes[getDayIndex(studyQuotes.length)]}”</p><p className="relative mt-3 text-xs font-medium uppercase tracking-wide text-ink-muted">Daily study note</p></div>
       </div>
