@@ -58,6 +58,131 @@ function CircularProgress({ percent, label }) {
 }
 
 
+
+const STUDY_HEATMAP_DAYS = 180;
+const DAY_MS = 24 * 60 * 60 * 1000;
+const weekdayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const monthFormatter = new Intl.DateTimeFormat(undefined, { month: 'short' });
+const fullDateFormatter = new Intl.DateTimeFormat(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
+
+const parseLocalDateKeyToDate = (dateKey) => {
+  const [year, month, day] = dateKey.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
+
+const addLocalCalendarDays = (date, days) => new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
+
+const getStudyHeatmapIntensity = (seconds) => {
+  if (seconds <= 0) return 0;
+  if (seconds < 60 * 60) return 1;
+  if (seconds < 3 * 60 * 60) return 2;
+  if (seconds < 6 * 60 * 60) return 3;
+  return 4;
+};
+
+const getStudyHeatmapCellClass = (intensity) => {
+  const classes = [
+    'border-stone-200 bg-stone-100/80',
+    'border-sage-100 bg-sage-100',
+    'border-sage-200 bg-sage-300',
+    'border-sage-300 bg-sage-500',
+    'border-sage-500 bg-sage-700',
+  ];
+
+  return classes[intensity] ?? classes[0];
+};
+
+const buildStudyHeatmapWeeks = (dailySessions = {}) => {
+  const today = parseLocalDateKeyToDate(getLocalDateKey(Date.now()));
+  const firstStudyDate = addLocalCalendarDays(today, -(STUDY_HEATMAP_DAYS - 1));
+  const gridStartDate = addLocalCalendarDays(firstStudyDate, -firstStudyDate.getDay());
+  const gridEndDate = addLocalCalendarDays(today, 6 - today.getDay());
+  const totalGridDays = Math.round((gridEndDate.getTime() - gridStartDate.getTime()) / DAY_MS) + 1;
+  const weeks = [];
+
+  for (let dayIndex = 0; dayIndex < totalGridDays; dayIndex += 1) {
+    const date = addLocalCalendarDays(gridStartDate, dayIndex);
+    const dateKey = getLocalDateKey(date.getTime());
+    const seconds = Math.max(0, Math.floor(dailySessions?.[dateKey]?.totalSeconds ?? 0));
+    const inRange = date >= firstStudyDate && date <= today;
+    const cell = {
+      date,
+      dateKey,
+      seconds,
+      inRange,
+      intensity: inRange ? getStudyHeatmapIntensity(seconds) : 0,
+    };
+    const weekIndex = Math.floor(dayIndex / 7);
+
+    if (!weeks[weekIndex]) weeks[weekIndex] = [];
+    weeks[weekIndex].push(cell);
+  }
+
+  return weeks;
+};
+
+const getStudyHeatmapMonthLabels = (weeks) =>
+  weeks
+    .map((week, index) => {
+      const firstVisibleDay = week.find((cell) => cell.inRange && cell.date.getDate() <= 7);
+      return firstVisibleDay ? { label: monthFormatter.format(firstVisibleDay.date), column: index } : null;
+    })
+    .filter(Boolean);
+
+const getStudyHeatmapLabel = (cell) => `${fullDateFormatter.format(cell.date)} — ${cell.seconds > 0 ? `${formatStudyTime(cell.seconds)} studied` : 'No study'}`;
+
+function StudyHeatmap({ dailySessions }) {
+  const weeks = useMemo(() => buildStudyHeatmapWeeks(dailySessions), [dailySessions]);
+  const monthLabels = useMemo(() => getStudyHeatmapMonthLabels(weeks), [weeks]);
+
+  return (
+    <section className="rounded-2xl border border-border bg-paper p-6 shadow-card">
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h3 className="text-base font-semibold text-ink">Study Heatmap</h3>
+          <p className="mt-1 text-sm text-ink-muted">Last 180 days of committed study sessions from daily logs.</p>
+        </div>
+        <div className="flex items-center gap-1.5 text-xs text-ink-muted" aria-hidden="true">
+          <span>Less</span>
+          {[0, 1, 2, 3, 4].map((level) => <span key={level} className={`h-3 w-3 rounded-sm border ${getStudyHeatmapCellClass(level)}`} />)}
+          <span>More</span>
+        </div>
+      </div>
+      <div className="overflow-x-auto pb-2">
+        <div className="min-w-max">
+          <div className="relative ml-9 mb-2 h-4 text-xs text-ink-muted">
+            {monthLabels.map(({ label, column }) => <span key={`${label}-${column}`} className="absolute" style={{ left: `${column * 18}px` }}>{label}</span>)}
+          </div>
+          <div className="flex gap-2">
+            <div className="grid grid-rows-7 gap-1.5 pr-1 text-[10px] leading-3 text-ink-muted">
+              {weekdayLabels.map((day, index) => <span key={day} className="h-3.5 tabular-nums">{index % 2 === 1 ? day : ''}</span>)}
+            </div>
+            <div className="flex gap-1.5" role="grid" aria-label="Study heatmap for the last 180 days including today">
+              {weeks.map((week, weekIndex) => (
+                <div key={week[0]?.dateKey ?? weekIndex} className="grid grid-rows-7 gap-1.5" role="row">
+                  {week.map((cell) => {
+                    const label = getStudyHeatmapLabel(cell);
+                    return (
+                      <button
+                        key={cell.dateKey}
+                        type="button"
+                        disabled={!cell.inRange}
+                        title={label}
+                        aria-label={label}
+                        className={`h-3.5 w-3.5 rounded-[4px] border transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500 focus-visible:ring-offset-2 ${cell.inRange ? getStudyHeatmapCellClass(cell.intensity) : 'border-transparent bg-transparent'}`}
+                      />
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 const JOURNAL_STORAGE_KEY = 'jee-planner-journal';
 const AMBIENT_STORAGE_KEY = 'jee-planner-ambient';
 const JOURNAL_PROMPTS = [
@@ -286,6 +411,10 @@ export function Dashboard({ plannerData }) {
         <StatCard label="Today's Study Time" value={todayStudySeconds > 0 ? formatStudyTime(todayStudySeconds) : 'Fresh start'} helper={todayStudySeconds > 0 ? "Committed sessions plus today's active timer" : 'Begin with one quiet timer session.'} Icon={Hourglass} empty={todayStudySeconds === 0} />
         <StatCard label="Current Streak" value={currentStreak > 0 ? formatStreak(currentStreak) : 'Start today!'} helper="Yesterday keeps the streak alive" Icon={Flame} tone="ember" />
         <StatCard label="Best Streak" value={formatStreak(committedStreaks.bestStreak)} helper="Longest committed run" Icon={Trophy} tone="ember" />
+      </div>
+
+      <div className="mt-6">
+        <StudyHeatmap dailySessions={plannerData.dailySessions} />
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
