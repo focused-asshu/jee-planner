@@ -8,6 +8,7 @@ import { useActiveTimer } from '../hooks/useActiveTimer';
 import { formatStudyTime } from '../lib/format';
 import { getLocalDateKey } from '../lib/storage';
 import { getCompletionStats, getStreaks, getTodayCommittedSeconds, getTotalStudySeconds, isChapterComplete } from '../lib/stats';
+import { getConsistencySummary, getMostStudied, getRecentlyFinished, getSubjectBalance, getWeakChapters } from '../lib/insights';
 
 function BotanicalCorner() {
   return (
@@ -177,6 +178,62 @@ function StudyHeatmap({ dailySessions }) {
               ))}
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
+function StudyInsights({ plannerData }) {
+  const weakChapters = useMemo(() => getWeakChapters(plannerData), [plannerData]);
+  const mostStudied = useMemo(() => getMostStudied(plannerData), [plannerData]);
+  const recentlyFinished = useMemo(() => getRecentlyFinished(plannerData), [plannerData]);
+  const subjectBalance = useMemo(() => getSubjectBalance(plannerData), [plannerData]);
+  const consistency = useMemo(() => getConsistencySummary(plannerData), [plannerData]);
+  const hasInsightData = weakChapters.length > 0 || mostStudied.length > 0 || recentlyFinished.length > 0 || Object.values(subjectBalance.totals).some((seconds) => seconds > 0) || consistency.studiedLastSevenDays > 0;
+
+  return (
+    <section className="rounded-2xl border border-border bg-paper p-6 shadow-card">
+      <div className="mb-5 flex items-start justify-between gap-3">
+        <div>
+          <h3 className="text-base font-semibold text-ink">Study Insights</h3>
+          <p className="mt-1 text-sm text-ink-muted">Quiet signals from your planner about what deserves attention next.</p>
+        </div>
+        <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-sage-50 text-sage-700"><CheckCircle2 className="h-5 w-5" aria-hidden="true" /></span>
+      </div>
+
+      {!hasInsightData ? (
+        <div className="rounded-2xl border border-sage-100 bg-sage-50/70 p-4 text-sm text-ink-muted">Start with one chapter and one timer session. Insights will become more useful as your planner fills up.</div>
+      ) : null}
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="rounded-2xl border border-amber-100 bg-white/70 p-4">
+          <h4 className="flex items-center gap-2 text-sm font-semibold text-ink"><Flame className="h-4 w-4 text-amber-600" />Needs Attention</h4>
+          {weakChapters.length ? <ol className="mt-3 space-y-2">{weakChapters.map((chapter) => <li key={`${chapter.subject}-${chapter.id}`} className="flex items-center justify-between gap-3 text-sm"><span className={chapter.isWeak ? 'font-semibold text-ink' : 'text-ink'}>{chapter.name}</span><span className="text-xs text-ink-muted">{chapter.subjectLabel}</span></li>)}</ol> : <p className="mt-3 text-sm text-ink-muted">No urgent weak spots yet. Keep completing the next small step.</p>}
+        </div>
+
+        <div className="rounded-2xl border border-sage-100 bg-white/70 p-4">
+          <h4 className="flex items-center gap-2 text-sm font-semibold text-ink"><Trophy className="h-4 w-4 text-sage-700" />Most Studied</h4>
+          {mostStudied.length ? <ol className="mt-3 space-y-2">{mostStudied.map((chapter) => <li key={`${chapter.subject}-${chapter.id}`} className="flex items-center justify-between gap-3 text-sm text-ink"><span>{chapter.name}</span><span className="text-xs tabular-nums text-ink-muted">{formatStudyTime(chapter.timeStudiedSeconds)}</span></li>)}</ol> : <p className="mt-3 text-sm text-ink-muted">Study time will appear here after your first committed session.</p>}
+        </div>
+
+        {recentlyFinished.length ? (
+          <div className="rounded-2xl border border-sky-100 bg-white/70 p-4">
+            <h4 className="flex items-center gap-2 text-sm font-semibold text-ink"><BookOpen className="h-4 w-4 text-sky-600" />Recently Finished</h4>
+            <ol className="mt-3 space-y-2">{recentlyFinished.map((chapter) => <li key={`${chapter.subject}-${chapter.id}`} className="flex items-center justify-between gap-3 text-sm text-ink"><span>{chapter.name}</span><span className="text-xs text-ink-muted">{chapter.dateKey}</span></li>)}</ol>
+          </div>
+        ) : null}
+
+        <div className="rounded-2xl border border-border bg-white/70 p-4">
+          <h4 className="flex items-center gap-2 text-sm font-semibold text-ink"><Clock className="h-4 w-4 text-sky-600" />Subject Balance</h4>
+          <p className="mt-3 text-sm text-ink">{subjectBalance.message}</p>
+          <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-ink-muted">{Object.entries(subjectBalance.totals).map(([subject, seconds]) => <span key={subject} className="rounded-xl bg-stone-50 px-2 py-1 text-center tabular-nums">{subjectLabels[subject]}<br />{formatStudyTime(seconds)}</span>)}</div>
+        </div>
+
+        <div className="rounded-2xl border border-border bg-white/70 p-4 lg:col-span-2">
+          <h4 className="flex items-center gap-2 text-sm font-semibold text-ink"><CheckCircle2 className="h-4 w-4 text-sage-700" />Consistency</h4>
+          <p className="mt-3 text-sm text-ink">{consistency.message}</p>
         </div>
       </div>
     </section>
@@ -415,6 +472,10 @@ export function Dashboard({ plannerData }) {
 
       <div className="mt-6">
         <StudyHeatmap dailySessions={plannerData.dailySessions} />
+      </div>
+
+      <div className="mt-6">
+        <StudyInsights plannerData={plannerData} />
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
