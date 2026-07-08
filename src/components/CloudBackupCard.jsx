@@ -3,14 +3,18 @@ import { CheckCircle2, Clock, RotateCcw, Square } from 'lucide-react';
 import { connectGoogle, disconnectGoogle, getGoogleProfile } from '../lib/googleAuth';
 import {
   AUTO_SAVE_DEBOUNCE_MS,
+  createBackupMetadata,
   downloadBackup,
+  getBackupDeviceLabel,
   getCloudBackupSettings,
   getLastLocalUpdate,
+  listBackupHistory,
   restoreBackupPayload,
   saveCloudBackupSettings,
   shouldAutoBackup,
   uploadBackup,
 } from '../lib/googleDriveBackup';
+import { formatStudyTime } from '../lib/format';
 import { loadData } from '../lib/storage';
 
 const formatDateTime = (value) => {
@@ -19,6 +23,30 @@ const formatDateTime = (value) => {
   if (Number.isNaN(date.getTime())) return 'Unknown';
   return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(date);
 };
+
+const formatBackupTime = (value) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return { relative: 'Unknown', exact: 'Unknown' };
+
+  const today = new Date();
+  const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+  const startOfDate = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+  const dayDiff = Math.round((startOfToday - startOfDate) / 86400000);
+  const relative = dayDiff === 0 ? 'Today' : dayDiff === 1 ? 'Yesterday' : `${dayDiff} days ago`;
+  const exact = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(date);
+  const time = new Intl.DateTimeFormat(undefined, { timeStyle: 'short' }).format(date);
+
+  return { relative, exact, time };
+};
+
+const formatBackupSummary = (metadata = {}) => {
+  const chapterCount = metadata.chapterCount ?? '—';
+  const completedChapters = metadata.completedChapters ?? '—';
+  const studied = typeof metadata.totalStudySeconds === 'number' ? formatStudyTime(metadata.totalStudySeconds) : 'study time unavailable';
+  return `${chapterCount} chapters • ${completedChapters} completed • ${studied} studied`;
+};
+
+const getFileDisplayTime = (file) => file.backupUpdatedAt || file.modifiedTime;
 
 const isOffline = () => typeof navigator !== 'undefined' && !navigator.onLine;
 
@@ -29,7 +57,6 @@ const getBackupStatusLabel = ({ online, isSaving, lastError, dirty }) => {
   if (dirty) return 'Unsaved changes — autosave pending';
   return '✓ All changes saved';
 };
-
 export function CloudBackupCard({ plannerData, onRestoreComplete }) {
   const [profile, setProfile] = useState(() => getGoogleProfile());
   const [settings, setSettings] = useState(() => getCloudBackupSettings());
@@ -38,6 +65,9 @@ export function CloudBackupCard({ plannerData, onRestoreComplete }) {
   const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [autoSaveError, setAutoSaveError] = useState('');
   const [online, setOnline] = useState(() => !isOffline());
+  const [backupHistory, setBackupHistory] = useState([]);
+  const [backupStorage, setBackupStorage] = useState('Backup storage: unavailable');
+  const [historyError, setHistoryError] = useState('');
 
   const isConnected = Boolean(profile);
   const lastLocalUpdate = getLastLocalUpdate();
@@ -52,6 +82,19 @@ export function CloudBackupCard({ plannerData, onRestoreComplete }) {
   const backupStatus = getBackupStatusLabel({ online, isSaving: isAutoSaving || isBusy, lastError: autoSaveError, dirty });
 
   const refreshSettings = () => setSettings(getCloudBackupSettings());
+
+  const refreshBackupHistory = async ({ force = false } = {}) => {
+    if ((!isConnected && !force) || !navigator.onLine) return;
+
+    try {
+      const history = await listBackupHistory();
+      setBackupHistory(history.files);
+      setBackupStorage(history.storageSummary);
+      setHistoryError('');
+    } catch (error) {
+      setHistoryError(error.message || 'Backup History is unavailable right now.');
+    }
+  };
 
   const flushAutoSave = async ({ silent = false } = {}) => {
     refreshSettings();
@@ -69,6 +112,7 @@ export function CloudBackupCard({ plannerData, onRestoreComplete }) {
     try {
       await uploadBackup();
       refreshSettings();
+      await refreshBackupHistory();
       if (!silent) setStatusMessage('✓ All changes saved');
     } catch (error) {
       setAutoSaveError(error.message || 'Backup failed — will retry automatically');
@@ -82,6 +126,7 @@ export function CloudBackupCard({ plannerData, onRestoreComplete }) {
     const handleOnline = () => {
       setOnline(true);
       window.setTimeout(() => flushAutoSave({ silent: true }), 0);
+      window.setTimeout(refreshBackupHistory, 0);
     };
     const handleOffline = () => setOnline(false);
     window.addEventListener('online', handleOnline);
@@ -95,6 +140,10 @@ export function CloudBackupCard({ plannerData, onRestoreComplete }) {
   useEffect(() => {
     refreshSettings();
   }, [plannerData]);
+
+  useEffect(() => {
+    refreshBackupHistory();
+  }, [isConnected, online]);
 
   useEffect(() => {
     if (!isConnected || !online || !autoBackup || !dirty) return undefined;
@@ -142,20 +191,33 @@ export function CloudBackupCard({ plannerData, onRestoreComplete }) {
   const handleConnect = () => runAction(async () => {
     const result = await connectGoogle();
     setProfile(result.profile);
+    await refreshBackupHistory({ force: true });
   }, 'Google Drive connected. AutoSave will run when enabled.');
 
-  const handleBackup = () => runAction(uploadBackup, '✓ All changes saved');
+  const handleBackup = () => runAction(async () => {
+    await uploadBackup();
+    await refreshBackupHistory();
+  }, '✓ All changes saved');
 
-  const handleRestore = () => runAction(async () => {
-    const backup = await downloadBackup();
+  const handleRestore = (file) => runAction(async () => {
+    const backup = await downloadBackup(file.id);
+    const metadata = backup.metadata ?? createBackupMetadata(backup.data?.planner);
+    const backupTime = formatBackupTime(backup.updatedAt);
+    const localMetadata = createBackupMetadata(loadData());
     const confirmation = [
-      'Cloud Backup',
-      formatDateTime(backup.updatedAt),
+      'Cloud Backup:',
+      `${backupTime.relative}, ${backupTime.time || formatDateTime(backup.updatedAt)}`,
+      getBackupDeviceLabel(metadata),
+      `${metadata.completedChapters ?? '—'} completed chapters`,
+      `${typeof metadata.totalStudySeconds === 'number' ? formatStudyTime(metadata.totalStudySeconds) : 'Study time unavailable'} studied`,
       '',
-      'Local Data',
+      'Local Data:',
       formatDateTime(lastLocalUpdate),
+      'Current browser data',
+      `${localMetadata.completedChapters} completed chapters`,
+      `${formatStudyTime(localMetadata.totalStudySeconds)} studied`,
       '',
-      'This will replace your current local data.',
+      'This will replace your current local planner data.',
     ].join('\n');
 
     if (!window.confirm(confirmation)) return;
@@ -167,6 +229,7 @@ export function CloudBackupCard({ plannerData, onRestoreComplete }) {
   const handleDisconnect = () => {
     disconnectGoogle();
     setProfile(null);
+    setBackupHistory([]);
     setStatusMessage('Google Drive disconnected. Local data remains on this device.');
   };
 
@@ -204,6 +267,7 @@ export function CloudBackupCard({ plannerData, onRestoreComplete }) {
         <Info label="Google account" value={accountLabel} />
         <Info label="Last Local Update" value={formatDateTime(lastLocalUpdate)} />
         <Info label="Last Cloud Backup" value={formatDateTime(settings.lastCloudBackup)} />
+        <Info label="Storage Used" value={backupStorage} />
       </div>
 
       {profile ? (
@@ -227,13 +291,48 @@ export function CloudBackupCard({ plannerData, onRestoreComplete }) {
       <div className="mt-5 flex flex-wrap gap-2">
         {!isConnected ? <Button onClick={handleConnect} disabled={!online || isBusy} icon={CheckCircle2}>Connect Google</Button> : null}
         <Button onClick={handleBackup} disabled={!isConnected || !online || isBusy} icon={CheckCircle2}>Backup Now</Button>
-        <Button onClick={handleRestore} disabled={!isConnected || !online || isBusy} icon={RotateCcw}>Restore Backup</Button>
         {isConnected ? <Button onClick={handleDisconnect} disabled={isBusy} icon={Square} variant="secondary">Disconnect</Button> : null}
+      </div>
+
+      <div className="mt-6 rounded-2xl border border-border bg-white p-4">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h3 className="text-base font-bold text-ink">Backup History</h3>
+            <p className="mt-1 text-xs text-ink-muted">Newest timestamped backups are listed first. Legacy single-file backups can still be restored.</p>
+          </div>
+          <Button onClick={refreshBackupHistory} disabled={!isConnected || !online || isBusy} icon={RotateCcw} variant="secondary">Refresh</Button>
+        </div>
+        {historyError ? <p className="mt-3 rounded-xl border border-ember-100 bg-ember-50 px-3 py-2 text-sm text-ember-700">{historyError}</p> : null}
+        {!isConnected ? <p className="mt-4 text-sm text-ink-muted">Connect Google Drive to view Backup History.</p> : null}
+        {isConnected && !backupHistory.length && !historyError ? <p className="mt-4 text-sm text-ink-muted">No backups found.</p> : null}
+        {backupHistory.length ? (
+          <div className="mt-4 grid gap-3">
+            {backupHistory.map((file) => <BackupHistoryCard key={file.id} file={file} onRestore={() => handleRestore(file)} disabled={isBusy || !online} />)}
+          </div>
+        ) : null}
       </div>
 
       {(isBusy || isAutoSaving) ? <p className="mt-4 flex items-center gap-2 text-sm text-ink-muted"><Clock className="h-4 w-4 animate-spin" /> {backupStatus}</p> : null}
       {statusMessage ? <p className="mt-4 rounded-xl border border-border bg-canvas px-3 py-2 text-sm text-ink-muted">{statusMessage}</p> : null}
     </section>
+  );
+}
+
+function BackupHistoryCard({ file, onRestore, disabled }) {
+  const displayTime = formatBackupTime(getFileDisplayTime(file));
+  const metadata = file.metadata ?? {};
+
+  return (
+    <div className="rounded-2xl border border-border bg-canvas p-4 sm:flex sm:items-center sm:justify-between sm:gap-4">
+      <div>
+        <p className="text-sm font-bold text-ink">{displayTime.relative} • {displayTime.time || displayTime.exact}{file.legacy ? ' • Legacy' : ''}</p>
+        <p className="mt-1 text-xs text-ink-muted">{displayTime.exact}</p>
+        <p className="mt-2 text-sm font-semibold text-ink">{getBackupDeviceLabel(metadata)}</p>
+        <p className="mt-1 text-sm text-ink-muted">Planner v{metadata.plannerVersion ?? '—'}</p>
+        <p className="mt-1 text-sm text-ink-muted">{formatBackupSummary(metadata)}</p>
+      </div>
+      <Button onClick={onRestore} disabled={disabled} icon={RotateCcw} variant="secondary">Restore</Button>
+    </div>
   );
 }
 
