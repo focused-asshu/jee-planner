@@ -1,6 +1,6 @@
 export const JEE_MAIN_EXAM = {
   label: 'JEE Main 2027',
-  date: '2027-01-15T09:00:00+05:30',
+  date: new Date(2027, 0, 19),
 };
 
 export const motivationalLines = [
