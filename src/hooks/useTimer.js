@@ -92,6 +92,11 @@ export function useTimer() {
     setPlannerData((currentData) => stopActiveTimer(currentData, stoppedAtEpochMs));
   };
 
+  const replacePlannerData = (nextData) => {
+    timerStore.stopTicking();
+    setPlannerData(nextData);
+  };
+
   const handleTimerReset = (subject, chapterId) => {
     setPlannerData((currentData) => {
       const nextData = resetChapterTimer(currentData, subject, chapterId);
@@ -111,5 +116,6 @@ export function useTimer() {
     handleTimerPause,
     handleTimerStop,
     handleTimerReset,
+    replacePlannerData,
   };
 }

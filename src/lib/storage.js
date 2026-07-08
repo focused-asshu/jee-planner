@@ -2,6 +2,34 @@ import { defaultChapters } from '../data/chapters';
 
 export const STORAGE_KEY = 'jee-planner-data';
 export const STORAGE_VERSION = 3;
+const LOCAL_UPDATE_KEY = 'jee-planner-last-local-update';
+const CLOUD_BACKUP_SETTINGS_KEY = 'jee-planner-cloud-backup-settings';
+
+const markCloudBackupDirty = (updatedAt = new Date().toISOString()) => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  window.localStorage.setItem(LOCAL_UPDATE_KEY, updatedAt);
+
+  try {
+    const settings = JSON.parse(window.localStorage.getItem(CLOUD_BACKUP_SETTINGS_KEY) ?? '{}');
+    window.localStorage.setItem(
+      CLOUD_BACKUP_SETTINGS_KEY,
+      JSON.stringify({
+        ...settings,
+        dirty: true,
+        dirtySince: settings.dirtySince ?? updatedAt,
+        lastDirtyAt: updatedAt,
+      }),
+    );
+  } catch {
+    window.localStorage.setItem(
+      CLOUD_BACKUP_SETTINGS_KEY,
+      JSON.stringify({ dirty: true, dirtySince: updatedAt, lastDirtyAt: updatedAt }),
+    );
+  }
+};
 
 const defaultProgressRecord = (id) => ({
   id,
@@ -308,6 +336,7 @@ export const saveData = (data) => {
   }
 
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  markCloudBackupDirty();
 };
 
 export const updateChapterField = (data, subject, chapterId, field, value) => {

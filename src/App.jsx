@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pause, Play, Search, Square, X } from 'lucide-react';
 import { ChapterTable } from './components/ChapterTable';
+import { CloudBackupCard } from './components/CloudBackupCard';
 import { Dashboard } from './components/Dashboard';
 import { FloatingActiveTimerBar } from './components/FloatingActiveTimerBar';
 import { SubjectTabs } from './components/SubjectTabs';
@@ -47,6 +48,7 @@ export default function App() {
     handleTimerPause,
     handleTimerStop,
     handleTimerReset: resetTimer,
+    replacePlannerData,
   } = useTimer();
   const [searchQuery, setSearchQuery] = useState('');
   const [highlightedChapterId, setHighlightedChapterId] = useState(null);
@@ -236,6 +238,8 @@ export default function App() {
         <div className="min-w-0 rounded-xl border border-border bg-paper shadow-card">
           {activeView === 'dashboard' ? (
             <Dashboard plannerData={plannerData} completionStats={completionStats} />
+          ) : activeView === 'settings' ? (
+            <CloudBackupCard plannerData={plannerData} onRestoreComplete={replacePlannerData} />
           ) : (
             <>
               <SubjectTabs activeSubject={activeSubject} onSubjectChange={handleSubjectChange} />
