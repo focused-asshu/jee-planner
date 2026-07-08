@@ -1,18 +1,15 @@
 import { useMemo, useState } from 'react';
 import { ChapterTable } from './components/ChapterTable';
+import { Dashboard } from './components/Dashboard';
 import { FloatingActiveTimerBar } from './components/FloatingActiveTimerBar';
 import { SubjectTabs } from './components/SubjectTabs';
+import { ViewTabs } from './components/ViewTabs';
 import { defaultChapters, subjectLabels } from './data/chapters';
 import { useTimer } from './hooks/useTimer';
-
-const isChapterComplete = (progress) =>
-  progress.lectures &&
-  progress.pyqs &&
-  progress.allenModule &&
-  progress.notesRevision &&
-  progress.testStatus === 'strong';
+import { getCompletionStats } from './lib/stats';
 
 export default function App() {
+  const [activeView, setActiveView] = useState('dashboard');
   const [activeSubject, setActiveSubject] = useState('physics');
   const {
     plannerData,
@@ -38,7 +35,8 @@ export default function App() {
     return activeChapters.filter((chapter) => chapter.name.toLowerCase().includes(normalizedQuery));
   }, [activeChapters, searchQuery]);
 
-  const completedCount = activeChapters.filter((chapter) => isChapterComplete(activeProgress[chapter.id])).length;
+  const completionStats = useMemo(() => getCompletionStats(plannerData, defaultChapters), [plannerData]);
+  const completedCount = completionStats.bySubject[activeSubject].completed;
 
   const activeTimerDetails = useMemo(() => {
     const activeTimer = plannerData.activeTimer;
@@ -89,6 +87,7 @@ export default function App() {
     }
 
     const { subject, chapterId } = plannerData.activeTimer;
+    setActiveView('study');
     setActiveSubject(subject);
     setSearchQuery('');
     setHighlightedChapterId(chapterId);
@@ -115,47 +114,55 @@ export default function App() {
           </p>
         </div>
 
+        <ViewTabs activeView={activeView} onViewChange={setActiveView} />
+
         <div className="rounded-lg border border-gray-200 bg-white">
-          <SubjectTabs activeSubject={activeSubject} onSubjectChange={handleSubjectChange} />
-          <div className="p-5">
-            <div className="mb-4 flex items-start justify-between gap-6">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-950">{subjectLabels[activeSubject]}</h2>
-                <p className="mt-1 text-sm text-gray-500">
-                  Update chapter progress here. Every change is saved locally immediately.
-                </p>
-              </div>
-              <div className="flex flex-col items-end gap-1 text-sm">
-                <span className="font-medium text-gray-800">
-                  Completed: {completedCount} / {activeChapters.length}
-                </span>
-                <span className="text-xs font-medium text-green-700">Saved ✓</span>
-              </div>
-            </div>
+          {activeView === 'dashboard' ? (
+            <Dashboard plannerData={plannerData} completionStats={completionStats} />
+          ) : (
+            <>
+              <SubjectTabs activeSubject={activeSubject} onSubjectChange={handleSubjectChange} />
+              <div className="p-5">
+                <div className="mb-4 flex items-start justify-between gap-6">
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-950">{subjectLabels[activeSubject]}</h2>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Update chapter progress here. Every change is saved locally immediately.
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-end gap-1 text-sm">
+                    <span className="font-medium text-gray-800">
+                      Completed: {completedCount} / {activeChapters.length}
+                    </span>
+                    <span className="text-xs font-medium text-green-700">Saved ✓</span>
+                  </div>
+                </div>
 
-            <label className="mb-4 block max-w-md text-sm font-medium text-gray-700">
-              Search chapters
-              <input
-                type="search"
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder={`Search ${subjectLabels[activeSubject]} chapters...`}
-                className="mt-2 w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
-              />
-            </label>
+                <label className="mb-4 block max-w-md text-sm font-medium text-gray-700">
+                  Search chapters
+                  <input
+                    type="search"
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                    placeholder={`Search ${subjectLabels[activeSubject]} chapters...`}
+                    className="mt-2 w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
+                  />
+                </label>
 
-            <ChapterTable
-              subject={activeSubject}
-              chapters={filteredChapters}
-              progressByChapterId={activeProgress}
-              activeTimer={plannerData.activeTimer}
-              onFieldChange={handleFieldChange}
-              onTimerStart={handleTimerStart}
-              onTimerPause={handleTimerPause}
-              onTimerReset={handleTimerReset}
-              highlightedChapterId={highlightedChapterId}
-            />
-          </div>
+                <ChapterTable
+                  subject={activeSubject}
+                  chapters={filteredChapters}
+                  progressByChapterId={activeProgress}
+                  activeTimer={plannerData.activeTimer}
+                  onFieldChange={handleFieldChange}
+                  onTimerStart={handleTimerStart}
+                  onTimerPause={handleTimerPause}
+                  onTimerReset={handleTimerReset}
+                  highlightedChapterId={highlightedChapterId}
+                />
+              </div>
+            </>
+          )}
         </div>
       </section>
       <FloatingActiveTimerBar

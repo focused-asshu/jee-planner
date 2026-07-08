@@ -28,7 +28,7 @@ export const createDefaultData = () => ({
   dailySessions: {},
 });
 
-const getLocalDateKey = (epochMs) => new Date(epochMs).toLocaleDateString('en-CA');
+export const getLocalDateKey = (epochMs) => new Date(epochMs).toLocaleDateString('en-CA');
 
 const getNextLocalMidnightEpochMs = (epochMs) => {
   const date = new Date(epochMs);
