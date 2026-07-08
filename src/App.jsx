@@ -222,10 +222,10 @@ export default function App() {
   }
 
   return (
-    <main className={`${appThemeClass} min-h-screen px-8 py-8 text-ink`}>
-      <section className="mx-auto max-w-7xl">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold tracking-tight text-ink">JEE Planner</h1>
+    <main className={`${appThemeClass} min-h-screen px-3 py-4 text-ink sm:px-5 lg:px-8 lg:py-8`}>
+      <section className="mx-auto max-w-7xl min-w-0">
+        <div className="mb-4 sm:mb-6">
+          <h1 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">JEE Planner</h1>
           <p className="mt-2 max-w-2xl text-sm text-ink-muted">
             Calm, local-first progress tracking for Physics, Chemistry, and Maths.
           </p>
@@ -233,21 +233,21 @@ export default function App() {
 
         <ViewTabs activeView={activeView} onViewChange={setActiveView} />
 
-        <div className="rounded-xl border border-border bg-paper shadow-card">
+        <div className="min-w-0 rounded-xl border border-border bg-paper shadow-card">
           {activeView === 'dashboard' ? (
             <Dashboard plannerData={plannerData} completionStats={completionStats} />
           ) : (
             <>
               <SubjectTabs activeSubject={activeSubject} onSubjectChange={handleSubjectChange} />
-              <div className="p-6">
-                <div className="mb-4 flex items-start justify-between gap-6">
+              <div className="p-3 sm:p-5 lg:p-6">
+                <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
                   <div>
                     <h2 className="text-lg font-semibold text-ink">{subjectLabels[activeSubject]}</h2>
                     <p className="mt-1 text-sm text-ink-muted">
                       Update chapter progress here. Every change is saved locally immediately.
                     </p>
                   </div>
-                  <div className="flex flex-col items-end gap-1 text-sm">
+                  <div className="flex flex-row items-center gap-2 text-sm sm:flex-col sm:items-end sm:gap-1">
                     <span className="font-medium tabular-nums text-ink">
                       Completed: {completedCount} / {activeChapters.length}
                     </span>
@@ -255,7 +255,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <label className="mb-4 block max-w-md text-sm font-medium text-ink">
+                <label className="mb-4 block w-full max-w-md text-sm font-medium text-ink sm:w-auto">
                   Search chapters
                   <div className="relative mt-2">
                     <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted" aria-hidden="true" />
@@ -265,7 +265,7 @@ export default function App() {
                       onChange={(event) => setSearchQuery(event.target.value)}
                       placeholder={`Search ${subjectLabels[activeSubject]} chapters...`}
                       ref={searchInputRef}
-                      className="w-full rounded-xl border border-white/70 bg-white/75 py-2.5 pl-10 pr-11 text-sm text-ink shadow-card outline-none backdrop-blur-md transition placeholder:text-ink-muted hover:-translate-y-0.5 hover:bg-white focus:border-sky-600 focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2"
+                      className="w-full rounded-xl border border-border bg-white py-2.5 pl-10 pr-11 text-sm text-ink shadow-sm outline-none transition-colors placeholder:text-ink-muted hover:bg-white focus:border-sky-600 focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2"
                     />
                     {searchQuery ? (
                       <button
@@ -298,12 +298,12 @@ export default function App() {
       </section>
       {showShortcutHelp ? (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-ink/20 px-4 backdrop-blur-sm"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-ink/20 px-4"
           role="dialog"
           aria-modal="true"
           aria-labelledby="shortcut-help-title"
         >
-          <div className="w-full max-w-md rounded-2xl border border-white/70 bg-white/80 p-6 shadow-card backdrop-blur-md">
+          <div className="w-full max-w-md rounded-2xl border border-white/70 bg-white p-5 shadow-card sm:p-6">
             <div className="flex items-center justify-between gap-4">
               <h2 id="shortcut-help-title" className="text-lg font-semibold text-ink">Keyboard shortcuts</h2>
               <button

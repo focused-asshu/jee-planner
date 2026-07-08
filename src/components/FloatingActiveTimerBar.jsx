@@ -33,28 +33,28 @@ export function FloatingActiveTimerBar({ activeTimerDetails, onNavigateToActiveT
       : activeTimerDetails.accumulatedBeforeStartSeconds;
 
   return (
-    <div className={isEmbedded ? 'flex justify-center' : 'fixed inset-x-0 bottom-5 z-50 flex justify-center px-4'}>
+    <div className={isEmbedded ? 'flex justify-center' : 'fixed inset-x-0 bottom-3 z-50 flex justify-center px-3 sm:bottom-5 sm:px-4'}>
       <div
         role="button"
         tabIndex={0}
         onClick={onNavigateToActiveTimer}
         onKeyDown={handleKeyDown}
-        className="floating-timer-enter w-full max-w-[560px] cursor-pointer rounded-2xl border border-white/70 border-l-4 border-l-ember-600 bg-white/75 p-4 text-left shadow-card backdrop-blur-md transition duration-200 ease-out hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2"
+        className="floating-timer-enter w-full max-w-[560px] cursor-pointer rounded-2xl border border-white/70 border-l-4 border-l-ember-600 bg-white p-3 text-left shadow-card transition-colors duration-150 ease-out hover:bg-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2 sm:p-4"
         aria-label={`Jump to active timer for ${activeTimerDetails.subjectLabel}, ${activeTimerDetails.chapterName}`}
       >
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-ink-muted">Currently Studying</p>
             <p className="mt-1 text-sm font-medium text-ink">
               {activeTimerDetails.subjectLabel} <span className="text-ink-muted">•</span> {activeTimerDetails.chapterName}
             </p>
           </div>
-          <p className="timer-signature timer-signature-active rounded-xl bg-ember-50 px-4 py-2 text-xl font-bold tabular-nums text-ember-700">
+          <p className="timer-signature timer-signature-active rounded-xl bg-ember-50 px-3 py-2 text-lg font-bold tabular-nums text-ember-700 sm:px-4 sm:text-xl">
             {formatFloatingTime(displaySeconds)}
           </p>
         </div>
 
-        <div className="mt-4 flex justify-end gap-2">
+        <div className="mt-3 flex justify-end gap-2 sm:mt-4">
           <button
             type="button"
             onClick={(event) => {

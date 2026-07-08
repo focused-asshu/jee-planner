@@ -10,7 +10,7 @@ const subjects = Object.keys(subjectLabels);
 
 export function SubjectTabs({ activeSubject, onSubjectChange }) {
   return (
-    <div className="sticky top-0 z-20 flex gap-2 border-b border-border bg-paper px-2">
+    <div className="sticky top-0 z-20 flex gap-1 overflow-x-auto border-b border-border bg-paper px-2 sm:gap-2">
       {subjects.map((subject) => {
         const isActive = subject === activeSubject;
         const Icon = subjectIcons[subject];
@@ -20,7 +20,7 @@ export function SubjectTabs({ activeSubject, onSubjectChange }) {
             key={subject}
             type="button"
             onClick={() => onSubjectChange(subject)}
-            className={`inline-flex items-center gap-2 border-b-2 px-5 py-3 text-sm font-medium transition-colors duration-200 ease-in-out active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2 ${
+            className={`inline-flex shrink-0 items-center gap-2 border-b-2 px-3 py-3 text-xs sm:px-5 sm:text-sm font-medium transition-colors duration-200 ease-in-out active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2 ${
               isActive
                 ? 'border-ember-600 text-ember-700'
                 : 'border-transparent text-ink-muted hover:border-sky-500 hover:bg-sky-50 hover:text-ink'
