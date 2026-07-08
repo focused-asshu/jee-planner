@@ -1,9 +1,47 @@
 import { useEffect, useState } from 'react';
 import { timerStore } from '../lib/timerStore';
-import { loadData, pauseActiveTimer, resetChapterTimer, startChapterTimer, updateChapterField } from '../lib/storage';
+import { loadData, pauseActiveTimer, resetChapterTimer, saveData, startChapterTimer, updateChapterField } from '../lib/storage';
 
 export function useTimer() {
   const [plannerData, setPlannerData] = useState(() => loadData());
+
+
+  useEffect(() => {
+    const unsubscribe = timerStore.setStorageReconcileHandler((event) => {
+      if (event.type === 'storage-cleared') {
+        setPlannerData((currentData) => ({ ...currentData, activeTimer: null }));
+        return;
+      }
+
+      if (event.type === 'superseded') {
+        setPlannerData((currentData) => {
+          const localActiveTimer = currentData.activeTimer;
+          const hasSameLocalTimer =
+            localActiveTimer?.subject === event.supersededTimer.subject &&
+            localActiveTimer?.chapterId === event.supersededTimer.chapterId;
+
+          if (!hasSameLocalTimer) {
+            return event.incomingData;
+          }
+
+          const pausedData = pauseActiveTimer(currentData, event.reconciledAtEpochMs);
+          const nextData = {
+            ...event.incomingData,
+            subjects: pausedData.subjects,
+            dailySessions: pausedData.dailySessions,
+          };
+
+          saveData(nextData);
+          return nextData;
+        });
+        return;
+      }
+
+      setPlannerData(event.incomingData);
+    });
+
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     const { activeTimer } = plannerData;
