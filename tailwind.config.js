@@ -18,6 +18,12 @@ export default {
           500: '#0EA5E9',
           600: '#0284C7',
         },
+        sage: {
+          50: '#F4F7F1',
+          200: '#DDE6D5',
+          500: '#8EA37A',
+          700: '#5F714F',
+        },
       },
       fontFamily: {
         sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Inter', 'system-ui', 'sans-serif'],
@@ -35,8 +41,8 @@ export default {
         xl: '0.75rem',
       },
       boxShadow: {
-        card: '0 1px 1px rgba(10,10,10,0.04), 0 3px 8px rgba(10,10,10,0.05)',
-        'card-hover': '0 1px 2px rgba(10,10,10,0.06), 0 6px 14px rgba(10,10,10,0.07)',
+        card: '0 1px 1px rgba(10,10,10,0.035), 0 8px 24px rgba(10,10,10,0.055)',
+        'card-hover': '0 2px 6px rgba(10,10,10,0.06), 0 14px 34px rgba(10,10,10,0.08)',
       },
     },
   },

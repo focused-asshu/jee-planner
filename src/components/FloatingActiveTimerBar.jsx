@@ -14,7 +14,7 @@ const formatFloatingTime = (seconds) => {
   return `${String(minutes).padStart(2, '0')}m ${String(safeSeconds % 60).padStart(2, '0')}s`;
 };
 
-export function FloatingActiveTimerBar({ activeTimerDetails, onNavigateToActiveTimer, onPause, onStop }) {
+export function FloatingActiveTimerBar({ activeTimerDetails, onNavigateToActiveTimer, onPause, onStop, isEmbedded = false }) {
   const activeTimer = useActiveTimer();
   const handleKeyDown = (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
@@ -33,13 +33,13 @@ export function FloatingActiveTimerBar({ activeTimerDetails, onNavigateToActiveT
       : activeTimerDetails.accumulatedBeforeStartSeconds;
 
   return (
-    <div className="fixed inset-x-0 bottom-5 z-50 flex justify-center px-4">
+    <div className={isEmbedded ? 'flex justify-center' : 'fixed inset-x-0 bottom-5 z-50 flex justify-center px-4'}>
       <div
         role="button"
         tabIndex={0}
         onClick={onNavigateToActiveTimer}
         onKeyDown={handleKeyDown}
-        className="floating-timer-enter w-full max-w-[520px] cursor-pointer rounded-xl border border-border border-l-4 border-l-ember-600 bg-paper p-4 text-left shadow-card transition duration-200 ease-out hover:-translate-y-0.5 hover:bg-sky-50 hover:shadow-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2"
+        className="floating-timer-enter w-full max-w-[560px] cursor-pointer rounded-2xl border border-white/70 border-l-4 border-l-ember-600 bg-white/75 p-4 text-left shadow-card backdrop-blur-md transition duration-200 ease-out hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2"
         aria-label={`Jump to active timer for ${activeTimerDetails.subjectLabel}, ${activeTimerDetails.chapterName}`}
       >
         <div className="flex items-start justify-between gap-4">
@@ -49,7 +49,7 @@ export function FloatingActiveTimerBar({ activeTimerDetails, onNavigateToActiveT
               {activeTimerDetails.subjectLabel} <span className="text-ink-muted">•</span> {activeTimerDetails.chapterName}
             </p>
           </div>
-          <p className="timer-signature timer-signature-active rounded-lg bg-ember-50 px-3 py-1 text-lg font-bold tabular-nums text-ember-700">
+          <p className="timer-signature timer-signature-active rounded-xl bg-ember-50 px-4 py-2 text-xl font-bold tabular-nums text-ember-700">
             {formatFloatingTime(displaySeconds)}
           </p>
         </div>
