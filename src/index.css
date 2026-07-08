@@ -5,26 +5,27 @@
 :root {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
   color: #0A0A0A;
-  background: #FAFAF9;
+  background: #F5F6F2;
 }
 
 html {
-  background: #FAFAF9;
+  background: #F5F6F2;
 }
 
 body {
   margin: 0;
   min-width: 1024px;
-  background: #FAFAF9;
+  background: #F5F6F2;
 }
 
 
 .app-shell {
   --time-bg:
-    radial-gradient(circle at 18% 0%, rgba(14, 165, 233, 0.08), transparent 30rem),
-    radial-gradient(circle at 82% 12%, rgba(220, 38, 38, 0.055), transparent 24rem),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.76), rgba(250, 250, 249, 0.96)),
-    #FAFAF9;
+    radial-gradient(circle at 88% 4%, rgba(255, 236, 190, 0.64), transparent 28rem),
+    radial-gradient(circle at 78% 12%, rgba(142, 163, 122, 0.18), transparent 30rem),
+    radial-gradient(circle at 18% 0%, rgba(14, 165, 233, 0.045), transparent 30rem),
+    linear-gradient(135deg, rgba(245, 246, 242, 0.9), rgba(250, 250, 247, 0.97)),
+    #F5F6F2;
   background: var(--time-bg);
   background-attachment: fixed;
   transition: background 700ms ease, color 200ms ease;
@@ -32,31 +33,35 @@ body {
 
 .app-theme-morning {
   --time-bg:
-    radial-gradient(circle at 16% 4%, rgba(251, 191, 36, 0.18), transparent 25rem),
-    radial-gradient(circle at 78% 10%, rgba(254, 226, 196, 0.58), transparent 30rem),
-    linear-gradient(135deg, #FFF7E8 0%, #FFFCF5 46%, #FAFAF9 100%);
+    radial-gradient(circle at 86% 2%, rgba(255, 232, 177, 0.72), transparent 30rem),
+    radial-gradient(circle at 18% 4%, rgba(251, 191, 36, 0.12), transparent 25rem),
+    radial-gradient(circle at 76% 16%, rgba(142, 163, 122, 0.18), transparent 31rem),
+    linear-gradient(135deg, #FFF7E8 0%, #FAFAF3 48%, #F5F6F2 100%);
 }
 
 .app-theme-afternoon {
   --time-bg:
-    radial-gradient(circle at 18% 0%, rgba(14, 165, 233, 0.075), transparent 30rem),
-    radial-gradient(circle at 84% 16%, rgba(221, 230, 213, 0.42), transparent 24rem),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(250, 250, 249, 0.98)),
-    #FAFAF9;
+    radial-gradient(circle at 88% 5%, rgba(255, 236, 190, 0.52), transparent 28rem),
+    radial-gradient(circle at 18% 0%, rgba(14, 165, 233, 0.055), transparent 30rem),
+    radial-gradient(circle at 84% 16%, rgba(221, 230, 213, 0.52), transparent 25rem),
+    linear-gradient(135deg, rgba(245, 246, 242, 0.94), rgba(250, 250, 247, 0.98)),
+    #F5F6F2;
 }
 
 .app-theme-evening {
   --time-bg:
-    radial-gradient(circle at 18% 2%, rgba(245, 158, 11, 0.18), transparent 28rem),
-    radial-gradient(circle at 82% 10%, rgba(220, 38, 38, 0.08), transparent 26rem),
-    linear-gradient(135deg, #FFF3D7 0%, #FFF8EB 48%, #FAFAF9 100%);
+    radial-gradient(circle at 86% 4%, rgba(255, 221, 159, 0.54), transparent 30rem),
+    radial-gradient(circle at 18% 2%, rgba(245, 158, 11, 0.13), transparent 28rem),
+    radial-gradient(circle at 82% 10%, rgba(142, 163, 122, 0.18), transparent 27rem),
+    linear-gradient(135deg, #FFF3D7 0%, #FAF4EA 48%, #F5F6F2 100%);
 }
 
 .app-theme-night {
   --time-bg:
-    radial-gradient(circle at 18% 0%, rgba(14, 165, 233, 0.055), transparent 28rem),
-    radial-gradient(circle at 80% 12%, rgba(120, 113, 108, 0.16), transparent 24rem),
-    linear-gradient(135deg, #EDE7DD 0%, #F6F0E8 52%, #F9F6F1 100%);
+    radial-gradient(circle at 86% 3%, rgba(255, 231, 181, 0.36), transparent 29rem),
+    radial-gradient(circle at 18% 0%, rgba(14, 165, 233, 0.045), transparent 28rem),
+    radial-gradient(circle at 80% 12%, rgba(120, 129, 101, 0.18), transparent 24rem),
+    linear-gradient(135deg, #EEE9DF 0%, #F4F0E8 52%, #F7F6F0 100%);
 }
 
 body::before {
@@ -64,9 +69,11 @@ body::before {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  opacity: 0.28;
-  background-image: radial-gradient(rgba(10, 10, 10, 0.08) 0.5px, transparent 0.5px);
-  background-size: 18px 18px;
+  opacity: 0.5;
+  background-image:
+    linear-gradient(115deg, rgba(92, 110, 82, 0.024) 0 1px, transparent 1px 12px),
+    radial-gradient(rgba(92, 110, 82, 0.045) 0.45px, transparent 0.45px);
+  background-size: 34px 34px, 22px 22px;
   z-index: -1;
 }
 
@@ -159,22 +166,22 @@ input {
 
 .dashboard-atmosphere {
   z-index: 0;
-  opacity: 0.9;
+  opacity: 0.95;
 }
 
 .dashboard-light {
   position: absolute;
   border-radius: 9999px;
-  filter: blur(18px);
+  filter: blur(22px);
   transform: translateZ(0);
 }
 
 .dashboard-light-one {
-  top: 1.5rem;
-  left: 11%;
-  height: 18rem;
-  width: 18rem;
-  background: radial-gradient(circle, rgba(251, 191, 36, 0.14), rgba(251, 191, 36, 0.035) 48%, transparent 72%);
+  top: -2rem;
+  right: 5%;
+  height: 25rem;
+  width: 25rem;
+  background: radial-gradient(circle, rgba(255, 231, 181, 0.28), rgba(142, 163, 122, 0.07) 46%, transparent 74%);
 }
 
 .dashboard-light-two {
@@ -182,13 +189,13 @@ input {
   top: 18rem;
   height: 24rem;
   width: 24rem;
-  background: radial-gradient(circle, rgba(142, 163, 122, 0.13), rgba(142, 163, 122, 0.035) 48%, transparent 74%);
+  background: radial-gradient(circle, rgba(142, 163, 122, 0.16), rgba(142, 163, 122, 0.045) 48%, transparent 74%);
 }
 
 .dashboard-particle-field {
   position: absolute;
   inset: 0;
-  opacity: 0.28;
+  opacity: 0.22;
   background-image:
     radial-gradient(circle, rgba(95, 113, 79, 0.28) 0 1px, transparent 1.4px),
     radial-gradient(circle, rgba(2, 132, 199, 0.13) 0 1px, transparent 1.6px),
@@ -208,7 +215,7 @@ input {
   top: 3.5rem;
   right: 7rem;
   width: min(38rem, 44vw);
-  opacity: 0.16;
+  opacity: 0.22;
 }
 
 .dashboard-orbit-line,
@@ -227,12 +234,20 @@ input {
 }
 
 .dashboard-orbit-line-soft {
-  opacity: 0.56;
+  opacity: 0.52;
+}
+
+.dashboard-orbit-line-whisper {
+  opacity: 0.38;
 }
 
 .dashboard-arc-line {
-  opacity: 0.5;
+  opacity: 0.48;
   stroke-dasharray: 2 10;
+}
+
+.dashboard-arc-line-whisper {
+  opacity: 0.34;
 }
 
 .dashboard-orbit-dot,
@@ -244,13 +259,18 @@ input {
   opacity: 0.58;
 }
 
+.dashboard-orbit-dot-glow {
+  opacity: 0.72;
+  filter: drop-shadow(0 0 5px rgba(142, 163, 122, 0.45));
+}
+
 .dashboard-atom-mark {
   position: absolute;
   top: 5.15rem;
   left: 18.5rem;
   width: 4.5rem;
   color: #8EA37A;
-  opacity: 0.18;
+  opacity: 0.23;
   overflow: visible;
 }
 
@@ -264,7 +284,7 @@ input {
   right: -1.5rem;
   top: -0.5rem;
   width: 17rem;
-  opacity: 0.105;
+  opacity: 0.095;
 }
 
 .dashboard-vine-bottom {

@@ -5,9 +5,9 @@ export default {
       colors: {
         ink: '#0A0A0A',
         'ink-muted': '#52525B',
-        paper: '#FFFFFF',
-        canvas: '#FAFAF9',
-        border: '#E7E5E4',
+        paper: '#FAFAF7',
+        canvas: '#F5F6F2',
+        border: '#DDE3D7',
         ember: {
           50: '#FEF2F2',
           600: '#DC2626',
@@ -41,8 +41,8 @@ export default {
         xl: '0.75rem',
       },
       boxShadow: {
-        card: '0 1px 1px rgba(10,10,10,0.035), 0 8px 24px rgba(10,10,10,0.055)',
-        'card-hover': '0 2px 6px rgba(10,10,10,0.06), 0 14px 34px rgba(10,10,10,0.08)',
+        card: '0 1px 1px rgba(75,85,58,0.035), 0 10px 30px rgba(75,85,58,0.085)',
+        'card-hover': '0 2px 8px rgba(75,85,58,0.07), 0 18px 42px rgba(75,85,58,0.11)',
       },
     },
   },

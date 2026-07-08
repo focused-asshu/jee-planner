@@ -8,9 +8,13 @@ export function DashboardAtmosphere() {
       <svg className="dashboard-orbits dashboard-orbits-hero" viewBox="0 0 520 260" fill="none">
         <ellipse cx="260" cy="128" rx="204" ry="58" className="dashboard-orbit-line" />
         <ellipse cx="260" cy="128" rx="188" ry="46" className="dashboard-orbit-line dashboard-orbit-line-soft" transform="rotate(-18 260 128)" />
+        <ellipse cx="260" cy="128" rx="154" ry="34" className="dashboard-orbit-line dashboard-orbit-line-whisper" transform="rotate(24 260 128)" />
         <path d="M78 158C138 78 249 42 392 78C434 89 467 108 493 133" className="dashboard-arc-line" />
+        <path d="M103 104C179 151 292 171 425 131" className="dashboard-arc-line dashboard-arc-line-whisper" />
         <circle cx="162" cy="83" r="3" className="dashboard-orbit-dot" />
         <circle cx="397" cy="177" r="2.5" className="dashboard-orbit-dot dashboard-orbit-dot-muted" />
+        <circle cx="291" cy="94" r="1.8" className="dashboard-orbit-dot dashboard-orbit-dot-glow" />
+        <circle cx="455" cy="126" r="1.5" className="dashboard-orbit-dot dashboard-orbit-dot-glow" />
       </svg>
 
       <svg className="dashboard-atom-mark" viewBox="0 0 96 96" fill="none">
