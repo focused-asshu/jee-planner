@@ -49,7 +49,7 @@ export function PlantCompanion({ totalStudySeconds }) {
   const remainingHours = stage.nextHours === null ? null : Math.max(0, stage.nextHours - studyHours);
 
   return (
-    <section className="relative overflow-hidden rounded-2xl border border-sage-200 bg-[#FBF7ED]/90 p-6 shadow-card">
+    <section className="relative overflow-hidden dashboard-card p-6">
       <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-sage-200/40" />
       <div className="relative flex items-center justify-between gap-5">
         <div>
@@ -57,11 +57,11 @@ export function PlantCompanion({ totalStudySeconds }) {
           <h3 className="mt-1 text-2xl font-bold text-ink">{stage.name}</h3>
           <p className="mt-2 text-sm text-ink-muted">Your plant is growing with your effort.</p>
           <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-            <div className="rounded-xl border border-sage-200 bg-white/65 p-3">
+            <div className="rounded-xl border border-sage-700/[0.12] bg-[#F7FAEF]/70 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
               <p className="text-xs text-ink-muted">Total study</p>
               <p className="mt-1 font-semibold tabular-nums text-ink">{formatHours(studyHours)}</p>
             </div>
-            <div className="rounded-xl border border-sage-200 bg-white/65 p-3">
+            <div className="rounded-xl border border-sage-700/[0.12] bg-[#F7FAEF]/70 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
               <p className="text-xs text-ink-muted">Next milestone</p>
               <p className="mt-1 font-semibold text-ink">{nextMilestone}</p>
             </div>

@@ -5,6 +5,13 @@ export function DashboardAtmosphere() {
       <div className="dashboard-light dashboard-light-two" />
       <div className="dashboard-particle-field" />
 
+      <svg className="dashboard-monstera" viewBox="0 0 360 420" fill="none">
+        <path d="M251 33C169 83 119 164 102 276C95 322 83 362 57 399" className="dashboard-monstera-stem" />
+        <path d="M227 58C177 62 133 99 119 153C102 219 138 276 192 279C254 282 303 221 306 153C308 93 276 55 227 58Z" className="dashboard-monstera-leaf" />
+        <path d="M209 78C202 115 202 151 211 187M159 119C180 127 195 140 207 160M259 117C239 128 224 145 214 169M148 181C169 184 188 194 207 212M268 187C246 192 229 203 215 222" className="dashboard-monstera-veins" />
+        <path d="M137 149C115 132 99 104 94 73M284 151C309 134 327 106 334 72M164 257C141 271 116 289 92 314M266 240C287 253 306 272 323 298" className="dashboard-monstera-cuts" />
+      </svg>
+
       <svg className="dashboard-orbits dashboard-orbits-hero" viewBox="0 0 520 260" fill="none">
         <ellipse cx="260" cy="128" rx="204" ry="58" className="dashboard-orbit-line" />
         <ellipse cx="260" cy="128" rx="188" ry="46" className="dashboard-orbit-line dashboard-orbit-line-soft" transform="rotate(-18 260 128)" />
@@ -16,6 +23,11 @@ export function DashboardAtmosphere() {
         <circle cx="291" cy="94" r="1.8" className="dashboard-orbit-dot dashboard-orbit-dot-glow" />
         <circle cx="455" cy="126" r="1.5" className="dashboard-orbit-dot dashboard-orbit-dot-glow" />
       </svg>
+
+      <div className="dashboard-equation dashboard-equation-one">ψ(x,t)</div>
+      <div className="dashboard-equation dashboard-equation-two">E = mc²</div>
+      <div className="dashboard-equation dashboard-equation-three">∫ B · dA = 0</div>
+      <div className="dashboard-equation dashboard-equation-four">λ · ħ</div>
 
       <svg className="dashboard-atom-mark" viewBox="0 0 96 96" fill="none">
         <circle cx="48" cy="48" r="3" className="dashboard-atom-core" />

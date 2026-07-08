@@ -20,9 +20,12 @@ export default {
         },
         sage: {
           50: '#F4F7F1',
+          100: '#EAF0E3',
           200: '#DDE6D5',
+          300: '#C6D4B9',
           500: '#8EA37A',
           700: '#5F714F',
+          800: '#46563A',
         },
       },
       fontFamily: {

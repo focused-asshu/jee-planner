@@ -21,12 +21,12 @@ function Shelf({ subject, completedChapters }) {
   const label = subjectLabels[subject];
 
   return (
-    <div className="rounded-xl border border-border/80 bg-white/70 p-4">
+    <div className="dashboard-card-subtle p-4">
       <div className="mb-3 flex items-center justify-between gap-3 text-sm">
         <h4 className="font-semibold text-ink">{label} shelf</h4>
         <span className="tabular-nums text-ink-muted">{label}: {bookCount} {bookCount === 1 ? 'book' : 'books'}</span>
       </div>
-      <div className="flex min-h-20 items-end gap-1.5 rounded-xl bg-stone-50 px-3 pt-4">
+      <div className="flex min-h-20 items-end gap-1.5 rounded-xl bg-[#EEF3E8]/80 px-3 pt-4 shadow-[inset_0_1px_7px_rgba(95,113,79,0.08)]">
         {bookCount > 0 ? completedChapters.map((chapter, index) => (
           <span
             key={chapter.id}
@@ -46,7 +46,7 @@ export function Bookshelf({ plannerData }) {
   const completedBySubject = getCompletedChaptersBySubject(plannerData);
 
   return (
-    <section className="rounded-2xl border border-border bg-paper p-6 shadow-card">
+    <section className="dashboard-card p-6">
       <div className="mb-4">
         <p className="text-sm font-medium text-sage-700">Bookshelf</p>
         <h3 className="mt-1 text-xl font-bold text-ink">Completed chapters become books</h3>
