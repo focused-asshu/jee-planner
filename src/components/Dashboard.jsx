@@ -150,8 +150,8 @@ function StudyHeatmap({ dailySessions }) {
     <section className="dashboard-card p-4 md:p-6">
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h3 className="text-base font-semibold text-ink">Study Garden Bed</h3>
-          <p className="mt-1 text-sm text-ink-muted">Last 180 days of committed study sessions, planted as quiet sage cells.</p>
+          <h3 className="text-base font-semibold text-ink">Study Timeline</h3>
+          <p className="mt-1 text-sm text-ink-muted">Last 180 days of committed study sessions, shown as quiet sage cells.</p>
         </div>
       </div>
       <div className="overflow-x-auto overscroll-x-contain pb-2">
@@ -193,7 +193,7 @@ function StudyHeatmap({ dailySessions }) {
           </div>
         </div>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-          {!hasStudySessions ? <p className="text-sm text-ink-muted">Plant your first study seed with one focused session.</p> : <span aria-hidden="true" />}
+          {!hasStudySessions ? <p className="text-sm text-ink-muted">Start your first study record with one focused session.</p> : <span aria-hidden="true" />}
           <div className="ml-auto flex items-center gap-1.5 text-xs text-ink-muted" aria-hidden="true">
             <span>Less</span>
             {[0, 1, 2, 3, 4].map((level) => <span key={level} className={`h-3 w-3 rounded-[4px] border ${getStudyHeatmapCellClass(level)}`} />)}
@@ -231,19 +231,19 @@ function MilestonesCard({ plannerData }) {
     <section className="dashboard-card p-4 md:p-6">
       <div className="mb-5 flex items-start justify-between gap-3">
         <div>
-          <h3 className="text-base font-semibold text-ink">Growth Milestones</h3>
-          <p className="mt-1 text-sm text-ink-muted">A quiet garden journal of meaningful preparation moments, derived only from your planner.</p>
+          <h3 className="text-base font-semibold text-ink">Study Milestones</h3>
+          <p className="mt-1 text-sm text-ink-muted">A quiet journal of meaningful preparation moments, derived only from your planner.</p>
         </div>
         <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-sage-50 text-sage-700"><Trophy className="h-5 w-5" aria-hidden="true" /></span>
       </div>
 
       {!hasAnyMilestoneProgress ? (
-        <div className="rounded-2xl border border-sage-200/80 bg-sage-50/70 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.62)] text-sm text-ink-muted">Your first sprout is waiting: commit one focused study session. The rest will unlock naturally as your planner garden grows.</div>
+        <div className="rounded-2xl border border-sage-200/80 bg-sage-50/70 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.62)] text-sm text-ink-muted">Commit one focused study session to unlock your first milestone. The rest will appear naturally as your preparation builds.</div>
       ) : null}
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="dashboard-card-subtle p-4">
-          <h4 className="flex items-center gap-2 text-sm font-semibold text-ink"><CheckCircle2 className="h-4 w-4 text-sage-700" />Fresh Blooms</h4>
+          <h4 className="flex items-center gap-2 text-sm font-semibold text-ink"><CheckCircle2 className="h-4 w-4 text-sage-700" />Recent Wins</h4>
           {recentlyUnlocked.length ? (
             <ol className="mt-3 space-y-3">
               {recentlyUnlocked.map((milestone) => (
@@ -260,7 +260,7 @@ function MilestonesCard({ plannerData }) {
         </div>
 
         <div className="dashboard-card-subtle p-4">
-          <h4 className="flex items-center gap-2 text-sm font-semibold text-ink"><Flame className="h-4 w-4 text-ember-600" />Next Growth</h4>
+          <h4 className="flex items-center gap-2 text-sm font-semibold text-ink"><Flame className="h-4 w-4 text-ember-600" />Next Targets</h4>
           <ol className="mt-3 space-y-3">
             {nextMilestones.map((milestone) => {
               const percent = Math.round(milestone.progress * 100);
@@ -302,19 +302,19 @@ function StudyInsights({ plannerData }) {
     <section className="dashboard-card p-4 md:p-6">
       <div className="mb-5 flex items-start justify-between gap-3">
         <div>
-          <h3 className="text-base font-semibold text-ink">Garden Insights</h3>
-          <p className="mt-1 text-sm text-ink-muted">Quiet signals from your planner about what needs watering next.</p>
+          <h3 className="text-base font-semibold text-ink">Study Insights</h3>
+          <p className="mt-1 text-sm text-ink-muted">Quiet signals from your planner about what needs attention next.</p>
         </div>
         <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-sage-50 text-sage-700"><CheckCircle2 className="h-5 w-5" aria-hidden="true" /></span>
       </div>
 
       {!hasInsightData ? (
-        <div className="rounded-2xl border border-sage-200/80 bg-sage-50/70 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.62)] text-sm text-ink-muted">Start with one chapter and one timer session. Insights will grow more useful as your garden fills in.</div>
+        <div className="rounded-2xl border border-sage-200/80 bg-sage-50/70 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.62)] text-sm text-ink-muted">Start with one chapter and one timer session. Insights will become more useful as your study record builds.</div>
       ) : null}
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="dashboard-card-subtle p-4">
-          <h4 className="flex items-center gap-2 text-sm font-semibold text-ink"><Flame className="h-4 w-4 text-amber-600" />Needs Watering</h4>
+          <h4 className="flex items-center gap-2 text-sm font-semibold text-ink"><Flame className="h-4 w-4 text-amber-600" />Needs Attention</h4>
           {weakChapters.length ? <ol className="mt-3 space-y-2">{weakChapters.map((chapter) => <li key={`${chapter.subject}-${chapter.id}`} className="flex items-center justify-between gap-3 text-sm"><span className={chapter.isWeak ? 'font-semibold text-ink' : 'text-ink'}>{chapter.name}</span><span className="text-xs text-ink-muted">{chapter.subjectLabel}</span></li>)}</ol> : <p className="mt-3 text-sm text-ink-muted">No urgent weak spots yet. Keep completing the next small step.</p>}
         </div>
 
@@ -567,8 +567,8 @@ export function Dashboard({ plannerData }) {
         <div className="dashboard-hero-equations" aria-hidden="true">∮ B·dl = μ₀I · λ = h/p · ΔE = hν · ∇×E = −∂B/∂t</div>
         <div className="relative flex flex-wrap items-end justify-between gap-5">
           <div className="max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sage-700/80">Dashboard · Cozy study garden</p>
-            <h2 className="mt-2 text-3xl font-semibold leading-tight tracking-[-0.04em] text-ink md:text-[2.85rem] md:leading-[1.02] md:tracking-[-0.055em]">{getGreeting()}, gardener 🌿</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sage-700/80">Dashboard · Botanical study desk</p>
+            <h2 className="mt-2 text-3xl font-semibold leading-tight tracking-[-0.04em] text-ink md:text-[2.85rem] md:leading-[1.02] md:tracking-[-0.055em]">{getGreeting()}, Aashish</h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-ink-muted md:text-base md:leading-7">{motivationalLines[getDayIndex(motivationalLines.length)]}</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
@@ -583,7 +583,7 @@ export function Dashboard({ plannerData }) {
           <div className="flex items-start justify-between gap-4"><div><h3 className="text-base font-semibold text-ink">{JEE_MAIN_EXAM.label}</h3><p className="mt-2 text-3xl font-bold tabular-nums text-ink">{daysRemaining} Days Remaining</p></div><CircularProgress percent={overallPercent} label="Syllabus" /></div>
           <div className="mt-5 h-2.5 overflow-hidden rounded-full bg-[#DDE6D0]"><div className="h-full rounded-full progress-bar-sage transition-[width] duration-500 ease-out" style={{ width: `${countdownPercent}%` }} /></div>
         </div>
-        <div className="dashboard-card p-4 md:p-6"><h3 className="text-base font-semibold text-ink">Today's Garden Tasks</h3><ul className="mt-4 space-y-3">{missionItems.map((item) => <li key={item} className="flex items-center gap-3 text-sm text-ink"><span className="h-2 w-2 rounded-full bg-sage-500" />{item}</li>)}</ul></div>
+        <div className="dashboard-card p-4 md:p-6"><h3 className="text-base font-semibold text-ink">Today's Mission</h3><ul className="mt-4 space-y-3">{missionItems.map((item) => <li key={item} className="flex items-center gap-3 text-sm text-ink"><span className="h-2 w-2 rounded-full bg-sage-500" />{item}</li>)}</ul></div>
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5 lg:gap-4">
