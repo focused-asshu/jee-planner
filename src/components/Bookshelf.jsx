@@ -26,7 +26,7 @@ function Shelf({ subject, completedChapters }) {
         <h4 className="font-semibold text-ink">{label} shelf</h4>
         <span className="tabular-nums text-ink-muted">{label}: {bookCount} {bookCount === 1 ? 'book' : 'books'}</span>
       </div>
-      <div className="flex min-h-20 items-end gap-1.5 rounded-xl bg-[#EEF3E8]/80 px-3 pt-4 shadow-[inset_0_1px_7px_rgba(95,113,79,0.08)]">
+      <div className="flex min-h-20 items-end gap-1.5 rounded-xl bg-[#E6EEDC]/85 px-3 pt-4 shadow-[inset_0_1px_7px_rgba(95,113,79,0.08)]">
         {bookCount > 0 ? completedChapters.map((chapter, index) => (
           <span
             key={chapter.id}
@@ -37,7 +37,7 @@ function Shelf({ subject, completedChapters }) {
           />
         )) : <p className="pb-4 text-xs text-ink-muted">Complete a chapter to place the first book here.</p>}
       </div>
-      <div className="h-2 rounded-b-lg bg-[#8A6842]" />
+      <div className="h-2 rounded-b-lg bg-[#7C8056]" />
     </div>
   );
 }
