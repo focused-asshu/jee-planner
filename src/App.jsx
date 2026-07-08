@@ -200,7 +200,7 @@ export default function App() {
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-ink-muted">Focus Mode</p>
             <h1 className="mt-4 text-3xl font-bold tracking-tight text-ink">{activeTimerDetails?.chapterName ?? 'Choose a chapter to begin'}</h1>
             <p className="mt-2 text-sm text-ink-muted">{activeTimerDetails?.subjectLabel ?? 'Press ESC to return to the planner'}</p>
-            <div className="mt-8 rounded-2xl border border-white/70 bg-white/80 p-6 shadow-card backdrop-blur-md">
+            <div className="mt-8 rounded-2xl border border-border bg-white p-6 shadow-card">
               <FloatingActiveTimerBar activeTimerDetails={activeTimerDetails} onNavigateToActiveTimer={handleActiveTimerNavigate} onPause={handleTimerPause} onStop={handleTimerStop} isEmbedded />
               {!activeTimerDetails ? <p className="text-lg font-semibold text-ink-muted">Timer is quiet.</p> : null}
             </div>

@@ -12,23 +12,12 @@ import { getCompletionStats, getStreaks, getTodayCommittedSeconds, getTotalStudy
 import { getConsistencySummary, getMostStudied, getRecentlyFinished, getSubjectBalance, getWeakChapters } from '../lib/insights';
 import { getMilestones } from '../lib/milestones';
 
-function BotanicalCorner() {
-  return (
-    <svg className="pointer-events-none absolute right-4 top-3 h-44 w-44 text-sage-500 opacity-[0.07]" viewBox="0 0 160 160" fill="none" aria-hidden="true">
-      <path d="M112 142C104 104 100 65 124 22" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-      {[28, 42, 58, 74, 92, 110].map((y, index) => (
-        <path key={y} d={index % 2 ? `M113 ${y}c-19 2-31 12-39 28` : `M116 ${y}c17 3 27 14 33 30`} stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-      ))}
-    </svg>
-  );
-}
 
 function StatCard({ label, value, helper, Icon, tone = 'neutral', empty = false }) {
   const iconTone = tone === 'ember' ? 'bg-ember-50 text-ember-700' : tone === 'sage' ? 'bg-sage-50 text-sage-700' : 'bg-sky-50 text-sky-600';
 
   return (
-    <div className="relative overflow-hidden dashboard-card p-4 transition duration-150 ease-out md:p-6 md:hover:-translate-y-0.5">
-      {empty ? <BotanicalCorner /> : null}
+    <div className="relative overflow-hidden dashboard-card p-4 transition-colors duration-150 ease-out md:p-6">
       <div className="relative flex items-start justify-between gap-3">
         <p className="text-sm font-medium text-ink-muted">{label}</p>
         <span className={`inline-flex h-10 w-10 items-center justify-center rounded-xl ${iconTone}`}>
@@ -88,11 +77,11 @@ const getStudyHeatmapIntensity = (seconds) => {
 
 const getStudyHeatmapCellClass = (intensity) => {
   const classes = [
-    'border-sage-200/70 bg-[#E7EDDF]/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]',
-    'border-sage-200 bg-gradient-to-br from-[#DCE8D0] to-[#BFD0AD]',
-    'border-sage-300 bg-gradient-to-br from-[#BFD0AD] to-[#91AB7B]',
-    'border-sage-500 bg-gradient-to-br from-[#97B180] to-[#647A53]',
-    'border-sage-700 bg-gradient-to-br from-[#748B61] to-[#3F5136] shadow-[0_1px_5px_rgba(95,113,79,0.28)]',
+    'border-sage-200/70 bg-[#E7EDDF]',
+    'border-sage-200 bg-[#DCE8D0]',
+    'border-sage-300 bg-[#BFD0AD]',
+    'border-sage-500 bg-[#91AB7B]',
+    'border-sage-700 bg-[#647A53]',
   ];
 
   return classes[intensity] ?? classes[0];
@@ -193,7 +182,7 @@ function StudyHeatmap({ dailySessions }) {
                         disabled={!cell.inRange}
                         title={label}
                         aria-label={label}
-                        className={`h-3 w-3 rounded-[4px] border transition duration-150 ease-out hover:scale-110 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500 focus-visible:ring-offset-2 ${cell.inRange ? getStudyHeatmapCellClass(cell.intensity) : 'border-transparent bg-transparent'}`}
+                        className={`h-3 w-3 rounded-[4px] border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500 focus-visible:ring-offset-2 ${cell.inRange ? getStudyHeatmapCellClass(cell.intensity) : 'border-transparent bg-transparent'}`}
                       />
                     );
                   })}
@@ -560,9 +549,7 @@ export function Dashboard({ plannerData }) {
   return (
     <div className="relative overflow-hidden p-3 dashboard-view sm:p-5 lg:p-7">
       <DashboardAtmosphere />
-      <BotanicalCorner />
       <section className="dashboard-hero relative mb-4 overflow-hidden rounded-[1.25rem] px-4 py-5 md:mb-5 md:rounded-[2rem] md:px-7 md:py-6">
-        <div className="dashboard-hero-orbit" aria-hidden="true" />
         <div className="relative flex flex-wrap items-end justify-between gap-5">
           <div className="max-w-3xl">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sage-700/80">Dashboard · Botanical physics journal</p>
@@ -618,7 +605,7 @@ export function Dashboard({ plannerData }) {
           <div className="mb-4"><h3 className="text-base font-semibold text-ink">Subject Progress</h3><p className="mt-1 text-sm text-ink-muted">Completion by subject, using the same criteria as the Study Planner.</p></div>
           <div className="space-y-4">{Object.entries(completionStats.bySubject).map(([subject, stats]) => { const percent = stats.total > 0 ? (stats.completed / stats.total) * 100 : 0; return <div key={subject}><div className="mb-2 flex items-center justify-between text-sm"><span className="font-medium text-ink">{subjectLabels[subject]}</span><span className="tabular-nums text-ink-muted">{stats.completed} / {stats.total} chapters</span></div><div className="h-3 overflow-hidden rounded-full bg-[#E9EDE5]"><div className="h-full rounded-full bg-ember-600 transition-[width] duration-500 ease-out" style={{ width: `${percent}%` }} /></div></div>; })}</div>
         </div>
-        <div className="relative overflow-hidden dashboard-card p-4 md:p-6"><BotanicalCorner /><Search className="h-5 w-5 text-sky-600" aria-hidden="true" /><p className="relative mt-5 text-lg font-semibold leading-relaxed text-ink">“{studyQuotes[getDayIndex(studyQuotes.length)]}”</p><p className="relative mt-3 text-xs font-medium uppercase tracking-wide text-ink-muted">Daily study note</p></div>
+        <div className="relative overflow-hidden dashboard-card p-4 md:p-6"><Search className="h-5 w-5 text-sky-600" aria-hidden="true" /><p className="relative mt-5 text-lg font-semibold leading-relaxed text-ink">“{studyQuotes[getDayIndex(studyQuotes.length)]}”</p><p className="relative mt-3 text-xs font-medium uppercase tracking-wide text-ink-muted">Daily study note</p></div>
       </div>
     </div>
   );

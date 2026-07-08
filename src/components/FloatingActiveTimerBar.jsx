@@ -39,7 +39,7 @@ export function FloatingActiveTimerBar({ activeTimerDetails, onNavigateToActiveT
         tabIndex={0}
         onClick={onNavigateToActiveTimer}
         onKeyDown={handleKeyDown}
-        className="floating-timer-enter w-full max-w-[560px] cursor-pointer rounded-2xl border border-white/70 border-l-4 border-l-ember-600 bg-white p-3 text-left shadow-card transition-colors duration-150 ease-out hover:bg-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2 sm:p-4"
+        className="w-full max-w-[560px] cursor-pointer rounded-2xl border border-border border-l-4 border-l-ember-600 bg-white p-3 text-left shadow-card transition-colors duration-150 ease-out hover:bg-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2 sm:p-4"
         aria-label={`Jump to active timer for ${activeTimerDetails.subjectLabel}, ${activeTimerDetails.chapterName}`}
       >
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
