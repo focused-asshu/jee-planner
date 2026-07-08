@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { CheckCircle2, Clock, Flame, Hourglass, Search, Trophy } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { BookOpen, CheckCircle2, Clock, Flame, Hourglass, Pause, Play, Search, Trophy } from 'lucide-react';
 import { Bookshelf } from './Bookshelf';
 import { PlantCompanion } from './PlantCompanion';
 import { JEE_MAIN_EXAM, motivationalLines, studyQuotes } from '../data/delight';
@@ -54,6 +54,155 @@ function CircularProgress({ percent, label }) {
         <p className="mt-1 text-xs text-ink-muted">overall completion</p>
       </div>
     </div>
+  );
+}
+
+
+const JOURNAL_STORAGE_KEY = 'jee-planner-journal';
+const AMBIENT_STORAGE_KEY = 'jee-planner-ambient';
+const JOURNAL_PROMPTS = [
+  'What went well today?',
+  'What should I improve tomorrow?',
+  'One thing I am proud of today:',
+];
+const AMBIENT_OPTIONS = [
+  { id: 'none', label: 'None', src: '' },
+  { id: 'nature', label: 'Nature', src: '/audio/nature.mp3' },
+  { id: 'rain', label: 'Rain', src: '/audio/rain.mp3' },
+  { id: 'library', label: 'Library', src: '/audio/library.mp3' },
+  { id: 'white-noise', label: 'White Noise', src: '/audio/white-noise.mp3' },
+];
+
+const getLocalDateFromOffset = (dayOffset = 0) => {
+  const date = new Date();
+  date.setDate(date.getDate() + dayOffset);
+  return getLocalDateKey(date.getTime());
+};
+
+const readJsonLocalStorage = (key, fallback) => {
+  if (typeof window === 'undefined') return fallback;
+
+  try {
+    const rawValue = window.localStorage.getItem(key);
+    return rawValue ? JSON.parse(rawValue) : fallback;
+  } catch (error) {
+    console.warn(`Unable to parse ${key}. Using default local value.`, error);
+    return fallback;
+  }
+};
+
+const writeJsonLocalStorage = (key, value) => {
+  if (typeof window === 'undefined') return;
+  window.localStorage.setItem(key, JSON.stringify(value));
+};
+
+function DailyJournalCard() {
+  const todayKey = useMemo(() => getLocalDateFromOffset(0), []);
+  const yesterdayKey = useMemo(() => getLocalDateFromOffset(-1), []);
+  const [journalEntries, setJournalEntries] = useState(() => readJsonLocalStorage(JOURNAL_STORAGE_KEY, {}));
+  const [entry, setEntry] = useState(() => readJsonLocalStorage(JOURNAL_STORAGE_KEY, {})[todayKey] ?? '');
+  const [saveStatus, setSaveStatus] = useState('Saved ✓');
+  const prompt = JOURNAL_PROMPTS[getDayIndex(JOURNAL_PROMPTS.length)];
+  const yesterdayEntry = journalEntries[yesterdayKey]?.trim();
+
+  useEffect(() => {
+    setSaveStatus('Saving…');
+    const saveTimeoutId = window.setTimeout(() => {
+      const nextEntries = {
+        ...readJsonLocalStorage(JOURNAL_STORAGE_KEY, {}),
+        [todayKey]: entry,
+      };
+      writeJsonLocalStorage(JOURNAL_STORAGE_KEY, nextEntries);
+      setJournalEntries(nextEntries);
+      setSaveStatus('Saved ✓');
+    }, 450);
+
+    return () => window.clearTimeout(saveTimeoutId);
+  }, [entry, todayKey]);
+
+  return (
+    <section className="rounded-2xl border border-amber-100 bg-[#FFF8E8]/90 p-5 shadow-card">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h3 className="flex items-center gap-2 text-base font-semibold text-ink"><BookOpen className="h-4 w-4 text-ember-600" />Daily Journal</h3>
+          <p className="mt-1 text-xs text-ink-muted">{prompt}</p>
+        </div>
+        <span className="rounded-full bg-white/70 px-3 py-1 text-xs font-medium text-sage-700">{saveStatus}</span>
+      </div>
+      <textarea
+        value={entry}
+        onChange={(event) => setEntry(event.target.value)}
+        rows={3}
+        maxLength={420}
+        placeholder="Write a short reflection for today…"
+        className="mt-3 w-full resize-none rounded-xl border border-amber-100 bg-white/65 px-3 py-2 text-sm leading-6 text-ink outline-none transition focus:border-ember-300 focus:ring-2 focus:ring-ember-100"
+      />
+      {yesterdayEntry ? <p className="mt-2 line-clamp-2 text-xs text-ink-muted">Yesterday: {yesterdayEntry}</p> : null}
+    </section>
+  );
+}
+
+function AmbientModeCard() {
+  const audioRef = useRef(null);
+  const [selectedAmbient, setSelectedAmbient] = useState(() => readJsonLocalStorage(AMBIENT_STORAGE_KEY, { selected: 'none', volume: 0.45 }));
+  const [isPlaying, setIsPlaying] = useState(false);
+  const activeOption = AMBIENT_OPTIONS.find((option) => option.id === selectedAmbient.selected) ?? AMBIENT_OPTIONS[0];
+  const canPlay = activeOption.id !== 'none';
+
+  useEffect(() => {
+    writeJsonLocalStorage(AMBIENT_STORAGE_KEY, selectedAmbient);
+  }, [selectedAmbient]);
+
+  useEffect(() => {
+    if (!audioRef.current) return;
+    audioRef.current.volume = selectedAmbient.volume;
+  }, [selectedAmbient.volume]);
+
+  const handleAmbientChange = (event) => {
+    setIsPlaying(false);
+    setSelectedAmbient((current) => ({ ...current, selected: event.target.value }));
+  };
+
+  const handlePlayPause = async () => {
+    if (!audioRef.current || !canPlay) return;
+
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+      return;
+    }
+
+    try {
+      await audioRef.current.play();
+      setIsPlaying(true);
+    } catch (error) {
+      console.warn('Ambient audio is unavailable until local files are added.', error);
+      setIsPlaying(false);
+    }
+  };
+
+  return (
+    <section className="rounded-2xl border border-sage-100 bg-sage-50/70 p-5 shadow-card">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h3 className="text-base font-semibold text-ink">Ambient Mode</h3>
+          <p className="mt-1 text-xs text-ink-muted">Choose a quiet backdrop. Audio never starts automatically.</p>
+        </div>
+        <button type="button" onClick={handlePlayPause} disabled={!canPlay} className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-sage-700 px-3 py-2 text-sm font-semibold text-white transition hover:bg-sage-800 disabled:cursor-not-allowed disabled:bg-stone-300">
+          {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}{isPlaying ? 'Pause' : 'Play'}
+        </button>
+      </div>
+      <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_120px]">
+        <select value={activeOption.id} onChange={handleAmbientChange} className="rounded-xl border border-sage-100 bg-white/75 px-3 py-2 text-sm text-ink outline-none focus:border-sage-300 focus:ring-2 focus:ring-sage-100">
+          {AMBIENT_OPTIONS.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
+        </select>
+        <label className="text-xs font-medium text-ink-muted">Volume
+          <input type="range" min="0" max="1" step="0.05" value={selectedAmbient.volume} onChange={(event) => setSelectedAmbient((current) => ({ ...current, volume: Number(event.target.value) }))} className="mt-1 w-full accent-sage-700" />
+        </label>
+      </div>
+      {/* TODO: Add local loop files at public/audio/nature.mp3, rain.mp3, library.mp3, and white-noise.mp3 when licensed assets are available. */}
+      {canPlay ? <audio ref={audioRef} key={activeOption.id} src={activeOption.src} loop preload="none" onEnded={() => setIsPlaying(false)} onError={() => setIsPlaying(false)} /> : null}
+    </section>
   );
 }
 
@@ -141,7 +290,11 @@ export function Dashboard({ plannerData }) {
 
       <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
         <Bookshelf plannerData={plannerData} />
-        <PlantCompanion totalStudySeconds={committedTotalStudySeconds} />
+        <div className="grid gap-4">
+          <DailyJournalCard />
+          <AmbientModeCard />
+          <PlantCompanion totalStudySeconds={committedTotalStudySeconds} />
+        </div>
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[1fr_320px]">
