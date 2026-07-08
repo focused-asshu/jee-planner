@@ -1,8 +1,9 @@
-import { BookOpen, LayoutDashboard } from 'lucide-react';
+import { BookOpen, LayoutDashboard, CheckCircle2 } from 'lucide-react';
 
 const views = [
   { id: 'dashboard', label: 'Dashboard', Icon: LayoutDashboard },
   { id: 'study', label: 'Study Planner', Icon: BookOpen },
+  { id: 'settings', label: 'Settings', Icon: CheckCircle2 },
 ];
 
 export function ViewTabs({ activeView, onViewChange }) {
