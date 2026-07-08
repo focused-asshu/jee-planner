@@ -25,61 +25,24 @@ body {
 
 
 .app-shell {
-  --time-bg:
-    radial-gradient(circle at 88% 4%, rgba(255, 236, 190, 0.64), transparent 28rem),
-    radial-gradient(circle at 78% 12%, rgba(142, 163, 122, 0.18), transparent 30rem),
-    radial-gradient(circle at 18% 0%, rgba(14, 165, 233, 0.045), transparent 30rem),
-    linear-gradient(135deg, rgba(245, 246, 242, 0.9), rgba(250, 250, 247, 0.97)),
-    #F5F6F2;
+  --time-bg: linear-gradient(180deg, #FAFAF7 0%, #F5F6F2 100%);
   background: var(--time-bg);
-  background-attachment: fixed;
-  transition: background 700ms ease, color 200ms ease;
 }
 
 .app-theme-morning {
-  --time-bg:
-    radial-gradient(circle at 86% 2%, rgba(255, 232, 177, 0.72), transparent 30rem),
-    radial-gradient(circle at 18% 4%, rgba(251, 191, 36, 0.12), transparent 25rem),
-    radial-gradient(circle at 76% 16%, rgba(142, 163, 122, 0.18), transparent 31rem),
-    linear-gradient(135deg, #FFF7E8 0%, #FAFAF3 48%, #F5F6F2 100%);
+  --time-bg: linear-gradient(180deg, #FFF7E8 0%, #F5F6F2 100%);
 }
 
 .app-theme-afternoon {
-  --time-bg:
-    radial-gradient(circle at 88% 5%, rgba(255, 236, 190, 0.52), transparent 28rem),
-    radial-gradient(circle at 18% 0%, rgba(14, 165, 233, 0.055), transparent 30rem),
-    radial-gradient(circle at 84% 16%, rgba(221, 230, 213, 0.52), transparent 25rem),
-    linear-gradient(135deg, rgba(245, 246, 242, 0.94), rgba(250, 250, 247, 0.98)),
-    #F5F6F2;
+  --time-bg: linear-gradient(180deg, #FAFAF7 0%, #F5F6F2 100%);
 }
 
 .app-theme-evening {
-  --time-bg:
-    radial-gradient(circle at 86% 4%, rgba(255, 221, 159, 0.54), transparent 30rem),
-    radial-gradient(circle at 18% 2%, rgba(245, 158, 11, 0.13), transparent 28rem),
-    radial-gradient(circle at 82% 10%, rgba(142, 163, 122, 0.18), transparent 27rem),
-    linear-gradient(135deg, #FFF3D7 0%, #FAF4EA 48%, #F5F6F2 100%);
+  --time-bg: linear-gradient(180deg, #FFF3D7 0%, #F5F6F2 100%);
 }
 
 .app-theme-night {
-  --time-bg:
-    radial-gradient(circle at 86% 3%, rgba(255, 231, 181, 0.36), transparent 29rem),
-    radial-gradient(circle at 18% 0%, rgba(14, 165, 233, 0.045), transparent 28rem),
-    radial-gradient(circle at 80% 12%, rgba(120, 129, 101, 0.18), transparent 24rem),
-    linear-gradient(135deg, #EEE9DF 0%, #F4F0E8 52%, #F7F6F0 100%);
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.5;
-  background-image:
-    linear-gradient(115deg, rgba(92, 110, 82, 0.024) 0 1px, transparent 1px 12px),
-    radial-gradient(rgba(92, 110, 82, 0.045) 0.45px, transparent 0.45px);
-  background-size: 34px 34px, 22px 22px;
-  z-index: -1;
+  --time-bg: linear-gradient(180deg, #EEE9DF 0%, #F7F6F0 100%);
 }
 
 button,
@@ -131,21 +94,8 @@ input {
   text-shadow: 0 0 14px rgba(220, 38, 38, 0.18);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .floating-timer-enter {
-    animation: floating-timer-in 120ms ease-out;
-  }
-}
-
-@keyframes floating-timer-in {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.001ms !important;
   }
@@ -153,6 +103,7 @@ input {
 
 .dashboard-view {
   isolation: isolate;
+  background: linear-gradient(180deg, rgba(244, 247, 241, 0.9), rgba(250, 250, 247, 0.98));
 }
 
 .dashboard-view > :not(.dashboard-atmosphere) {
@@ -162,42 +113,6 @@ input {
 
 .dashboard-atmosphere {
   z-index: 0;
-  opacity: 0.95;
-}
-
-.dashboard-light {
-  position: absolute;
-  border-radius: 9999px;
-  transform: translateZ(0);
-}
-
-.dashboard-light-one {
-  top: -2rem;
-  right: 5%;
-  height: 25rem;
-  width: 25rem;
-  background: radial-gradient(circle, rgba(255, 231, 181, 0.28), rgba(142, 163, 122, 0.07) 46%, transparent 74%);
-}
-
-.dashboard-light-two {
-  right: 4%;
-  top: 18rem;
-  height: 24rem;
-  width: 24rem;
-  background: radial-gradient(circle, rgba(142, 163, 122, 0.16), rgba(142, 163, 122, 0.045) 48%, transparent 74%);
-}
-
-.dashboard-particle-field {
-  position: absolute;
-  inset: 0;
-  opacity: 0.12;
-  background-image:
-    radial-gradient(circle, rgba(95, 113, 79, 0.28) 0 1px, transparent 1.4px),
-    radial-gradient(circle, rgba(2, 132, 199, 0.13) 0 1px, transparent 1.6px),
-    radial-gradient(circle, rgba(220, 38, 38, 0.08) 0 0.9px, transparent 1.4px);
-  background-position: 16px 20px, 88px 54px, 44px 100px;
-  background-size: 92px 92px, 138px 138px, 176px 176px;
-  mask-image: linear-gradient(to bottom, transparent, black 7%, black 86%, transparent);
 }
 
 .dashboard-orbits {
@@ -209,64 +124,28 @@ input {
 .dashboard-orbits-hero {
   top: 3.5rem;
   right: 7rem;
-  width: min(38rem, 44vw);
-  opacity: 0.12;
+  width: min(30rem, 38vw);
+  opacity: 0.10;
 }
 
-.dashboard-orbit-line,
-.dashboard-arc-line,
-.dashboard-atom-ring,
-.dashboard-stem {
+.dashboard-orbit-line {
   stroke: currentColor;
   stroke-width: 1.3;
   stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
-}
-
-.dashboard-orbit-line,
-.dashboard-atom-ring {
   stroke-dasharray: 9 12;
+  vector-effect: non-scaling-stroke;
 }
 
 .dashboard-orbit-line-soft {
   opacity: 0.52;
 }
 
-.dashboard-orbit-line-whisper {
-  opacity: 0.38;
-}
-
-.dashboard-arc-line {
-  opacity: 0.48;
-  stroke-dasharray: 2 10;
-}
-
-.dashboard-arc-line-whisper {
-  opacity: 0.34;
-}
-
-.dashboard-orbit-dot,
-.dashboard-atom-core {
+.dashboard-orbit-dot {
   fill: currentColor;
 }
 
 .dashboard-orbit-dot-muted {
   opacity: 0.58;
-}
-
-.dashboard-orbit-dot-glow {
-  opacity: 0.72;
-  filter: drop-shadow(0 0 5px rgba(142, 163, 122, 0.45));
-}
-
-.dashboard-atom-mark {
-  position: absolute;
-  top: 5.15rem;
-  left: 18.5rem;
-  width: 4.5rem;
-  color: #8EA37A;
-  opacity: 0.23;
-  overflow: visible;
 }
 
 .dashboard-leaves {
@@ -278,15 +157,8 @@ input {
 .dashboard-leaves-top {
   right: -1.5rem;
   top: -0.5rem;
-  width: 17rem;
-  opacity: 0.095;
-}
-
-.dashboard-vine-bottom {
-  bottom: 20rem;
-  left: -1.25rem;
-  width: 18rem;
-  opacity: 0.09;
+  width: 12rem;
+  opacity: 0.08;
 }
 
 .dashboard-leaf {
@@ -296,37 +168,10 @@ input {
 .dashboard-stem {
   fill: none;
   opacity: 0.78;
+  stroke: currentColor;
   stroke-width: 2;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .dashboard-light-one,
-  .dashboard-light-two,
-  .dashboard-orbits-hero,
-  .dashboard-particle-field {
-    animation: none !important;
-  }
-}
-
-.dashboard-view {
-  background:
-    radial-gradient(circle at 86% 3%, rgba(255, 224, 164, 0.34), transparent 25rem),
-    radial-gradient(circle at 18% 5%, rgba(142, 163, 122, 0.22), transparent 30rem),
-    radial-gradient(circle at 68% 38%, rgba(95, 113, 79, 0.10), transparent 35rem),
-    linear-gradient(135deg, rgba(241, 244, 232, 0.72), rgba(252, 248, 236, 0.62));
-}
-
-.dashboard-view::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.34;
-  background-image:
-    radial-gradient(rgba(95, 113, 79, 0.12) 0.55px, transparent 0.75px),
-    linear-gradient(105deg, rgba(95, 113, 79, 0.035) 0 1px, transparent 1px 18px);
-  background-size: 26px 26px, 42px 42px;
-  mask-image: linear-gradient(to bottom, black 0%, black 88%, transparent 100%);
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
 }
 
 .dashboard-card,
@@ -335,82 +180,21 @@ input {
   overflow: hidden;
   border-radius: 1rem;
   border: 1px solid rgba(95, 113, 79, 0.17);
-  background:
-    linear-gradient(145deg, rgba(255, 252, 241, 0.9), rgba(241, 246, 232, 0.82)),
-    radial-gradient(circle at 8% 0%, rgba(255, 229, 179, 0.20), transparent 17rem);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.72),
-    0 8px 20px rgba(86, 103, 72, 0.075);
-}
-
-.dashboard-card::before,
-.dashboard-card-subtle::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.12;
-  background-image: linear-gradient(120deg, transparent 0 46%, rgba(255, 255, 255, 0.34) 50%, transparent 55%);
+  background: #FFFDF5;
+  box-shadow: 0 4px 12px rgba(86, 103, 72, 0.08);
 }
 
 .dashboard-card-subtle {
   border-color: rgba(95, 113, 79, 0.13);
-  background: linear-gradient(145deg, rgba(255, 252, 241, 0.78), rgba(240, 246, 230, 0.66));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.68), 0 10px 26px rgba(86,103,72,0.07);
+  background: #FAFAF3;
+  box-shadow: 0 3px 10px rgba(86, 103, 72, 0.06);
 }
 
 .dashboard-hero {
   border: 1px solid rgba(95, 113, 79, 0.18);
-  background:
-    radial-gradient(circle at 86% 18%, rgba(255, 216, 145, 0.38), transparent 20rem),
-    radial-gradient(circle at 18% 0%, rgba(142, 163, 122, 0.24), transparent 24rem),
-    linear-gradient(135deg, rgba(255, 251, 238, 0.84), rgba(234, 242, 222, 0.74));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.76),
-    0 10px 26px rgba(75, 91, 62, 0.09);
+  background: #FFF9EA;
+  box-shadow: 0 4px 14px rgba(75, 91, 62, 0.08);
 }
-
-.dashboard-hero::before {
-  content: "";
-  position: absolute;
-  right: -2rem;
-  top: -5rem;
-  height: 22rem;
-  width: 22rem;
-  opacity: 0.06;
-  background: no-repeat center / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 220'%3E%3Cg fill='none' stroke='%235F714F' stroke-width='5' stroke-linecap='round'%3E%3Cpath d='M123 14C67 52 37 102 32 168'/%3E%3Cpath d='M113 38C78 47 55 74 51 112C46 159 80 190 121 177C165 163 185 105 165 65C154 43 136 33 113 38Z'/%3E%3Cpath d='M101 57C99 87 105 119 119 150M67 92C87 99 103 111 116 130M150 89C135 103 124 119 119 139M73 158C56 169 43 182 32 199M159 154C174 166 184 180 191 199'/%3E%3C/g%3E%3C/svg%3E");
-}
-
-.dashboard-hero-orbit {
-  position: absolute;
-  inset: -2rem 6rem auto auto;
-  height: 17rem;
-  width: 35rem;
-  opacity: 0.08;
-  background: no-repeat center / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 520 260' fill='none'%3E%3Cg stroke='%235F714F' stroke-width='2' stroke-linecap='round'%3E%3Cellipse cx='260' cy='130' rx='210' ry='56' stroke-dasharray='8 13'/%3E%3Cellipse cx='260' cy='130' rx='180' ry='42' transform='rotate(-19 260 130)' stroke-dasharray='7 12'/%3E%3Cellipse cx='260' cy='130' rx='148' ry='33' transform='rotate(27 260 130)' stroke-dasharray='5 13'/%3E%3C/g%3E%3C/svg%3E");
-}
-
-.dashboard-monstera {
-  position: absolute;
-  right: -3rem;
-  top: -2.5rem;
-  width: 26rem;
-  color: #5F714F;
-  opacity: 0.055;
-}
-
-.dashboard-monstera-stem,
-.dashboard-monstera-veins,
-.dashboard-monstera-cuts {
-  stroke: currentColor;
-  stroke-width: 6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.dashboard-monstera-leaf { fill: currentColor; }
-.dashboard-monstera-veins { stroke-width: 4; opacity: 0.75; }
-.dashboard-monstera-cuts { stroke-width: 10; opacity: 0.45; }
 
 .dashboard-equation {
   position: absolute;
@@ -425,22 +209,13 @@ input {
 .dashboard-equation-three { right: 13%; top: 34rem; }
 .dashboard-equation-four { left: 34%; top: 47rem; }
 
-
 @media (max-width: 767px) {
   .app-shell {
-    background-attachment: scroll;
     background: linear-gradient(180deg, #FAFAF7 0%, #F5F6F2 100%);
-    transition: none;
   }
 
-  body::before,
   .botanical-left,
-  .dashboard-atmosphere,
-  .dashboard-view::before,
-  .dashboard-hero::before,
-  .dashboard-hero-orbit,
-  .dashboard-card::before,
-  .dashboard-card-subtle::before {
+  .dashboard-atmosphere {
     display: none !important;
   }
 
@@ -454,10 +229,6 @@ input {
     border-radius: 1rem;
     background: #FAFAF7;
     box-shadow: 0 3px 12px rgba(75, 91, 62, 0.06);
-  }
-
-  .progress-ring {
-    transition: none;
   }
 
   .timer-signature-active {
