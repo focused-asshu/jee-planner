@@ -19,6 +19,7 @@ export default function App() {
     handleFieldChange: updateTimerField,
     handleTimerStart: startTimer,
     handleTimerPause,
+    handleTimerStop,
     handleTimerReset: resetTimer,
   } = useTimer();
   const [searchQuery, setSearchQuery] = useState('');
@@ -161,6 +162,7 @@ export default function App() {
         activeTimerDetails={activeTimerDetails}
         onNavigateToActiveTimer={handleActiveTimerNavigate}
         onPause={handleTimerPause}
+        onStop={handleTimerStop}
       />
     </main>
   );
