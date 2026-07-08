@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { Search, X } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Pause, Play, Search, Square, X } from 'lucide-react';
 import { ChapterTable } from './components/ChapterTable';
 import { Dashboard } from './components/Dashboard';
 import { FloatingActiveTimerBar } from './components/FloatingActiveTimerBar';
@@ -22,6 +22,9 @@ export default function App() {
   } = useTimer();
   const [searchQuery, setSearchQuery] = useState('');
   const [highlightedChapterId, setHighlightedChapterId] = useState(null);
+  const [isFocusMode, setIsFocusMode] = useState(false);
+  const [showShortcutHelp, setShowShortcutHelp] = useState(false);
+  const searchInputRef = useRef(null);
 
   const activeChapters = defaultChapters[activeSubject];
   const activeProgress = plannerData.subjects[activeSubject];
@@ -82,6 +85,34 @@ export default function App() {
     resetTimer(activeSubject, chapterId);
   };
 
+  useEffect(() => {
+    const isTypingTarget = (target) => ['INPUT', 'TEXTAREA', 'SELECT'].includes(target?.tagName) || target?.isContentEditable;
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setIsFocusMode(false);
+        setShowShortcutHelp(false);
+        return;
+      }
+      if (isTypingTarget(event.target)) return;
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        setActiveView('study');
+        window.setTimeout(() => searchInputRef.current?.focus(), 0);
+        return;
+      }
+      if (event.key === '?') {
+        event.preventDefault();
+        setShowShortcutHelp(true);
+        return;
+      }
+      if (event.key.toLowerCase() === 'f') setIsFocusMode(true);
+      if (event.key.toLowerCase() === 'd') setActiveView('dashboard');
+      if (event.key.toLowerCase() === 's') setActiveView('study');
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const handleActiveTimerNavigate = () => {
     if (!plannerData.activeTimer) {
       return;
@@ -104,6 +135,36 @@ export default function App() {
       setHighlightedChapterId((currentChapterId) => (currentChapterId === chapterId ? null : currentChapterId));
     }, 1600);
   };
+
+  if (isFocusMode) {
+    return (
+      <main className="min-h-screen bg-canvas text-ink">
+        <div className="flex min-h-screen items-center justify-center px-8">
+          <section className="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-border bg-paper p-10 text-center shadow-card">
+            <div className="botanical-left" aria-hidden="true" />
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-ink-muted">Focus Mode</p>
+            <h1 className="mt-4 text-3xl font-bold tracking-tight text-ink">{activeTimerDetails?.chapterName ?? 'Choose a chapter to begin'}</h1>
+            <p className="mt-2 text-sm text-ink-muted">{activeTimerDetails?.subjectLabel ?? 'Press ESC to return to the planner'}</p>
+            <div className="mt-8 rounded-2xl border border-white/70 bg-white/80 p-6 shadow-card backdrop-blur-md">
+              <FloatingActiveTimerBar activeTimerDetails={activeTimerDetails} onNavigateToActiveTimer={handleActiveTimerNavigate} onPause={handleTimerPause} onStop={handleTimerStop} isEmbedded />
+              {!activeTimerDetails ? <p className="text-lg font-semibold text-ink-muted">Timer is quiet.</p> : null}
+            </div>
+            <div className="mt-8 flex justify-center gap-3">
+              {activeTimerDetails ? (
+                <>
+                  <button type="button" onClick={handleTimerPause} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-border bg-paper px-5 py-2 text-sm font-semibold text-ink transition hover:-translate-y-0.5 hover:bg-sky-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600"><Pause className="h-4 w-4" />Pause</button>
+                  <button type="button" onClick={handleTimerStop} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-ember-600 px-5 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-ember-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600"><Square className="h-4 w-4" />Stop</button>
+                </>
+              ) : (
+                <button type="button" onClick={() => setIsFocusMode(false)} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-ember-600 px-5 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-ember-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600"><Play className="h-4 w-4" />Back to planner</button>
+              )}
+            </div>
+            <p className="mt-6 text-xs text-ink-muted">Press ESC to exit focus mode.</p>
+          </section>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-canvas px-8 py-8 text-ink">
@@ -148,7 +209,8 @@ export default function App() {
                       value={searchQuery}
                       onChange={(event) => setSearchQuery(event.target.value)}
                       placeholder={`Search ${subjectLabels[activeSubject]} chapters...`}
-                      className="w-full rounded-lg border border-border bg-paper py-2.5 pl-10 pr-11 text-sm text-ink outline-none transition-colors placeholder:text-ink-muted hover:bg-sky-50 focus:border-sky-600 focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2"
+                      ref={searchInputRef}
+                      className="w-full rounded-xl border border-white/70 bg-white/75 py-2.5 pl-10 pr-11 text-sm text-ink shadow-card outline-none backdrop-blur-md transition placeholder:text-ink-muted hover:-translate-y-0.5 hover:bg-white focus:border-sky-600 focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2"
                     />
                     {searchQuery ? (
                       <button
@@ -179,6 +241,14 @@ export default function App() {
           )}
         </div>
       </section>
+      {showShortcutHelp ? (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-ink/20 px-4 backdrop-blur-sm" role="dialog" aria-modal="true">
+          <div className="w-full max-w-sm rounded-2xl border border-border bg-paper p-6 shadow-card">
+            <div className="flex items-center justify-between"><h2 className="text-lg font-semibold text-ink">Keyboard shortcuts</h2><button type="button" onClick={() => setShowShortcutHelp(false)} className="rounded-lg p-2 text-ink-muted hover:bg-sky-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600"><X className="h-4 w-4" /></button></div>
+            <dl className="mt-5 space-y-3 text-sm"><div className="flex justify-between"><dt>Focus Mode</dt><dd className="font-semibold">F</dd></div><div className="flex justify-between"><dt>Search</dt><dd className="font-semibold">Ctrl K</dd></div><div className="flex justify-between"><dt>Dashboard</dt><dd className="font-semibold">D</dd></div><div className="flex justify-between"><dt>Study Planner</dt><dd className="font-semibold">S</dd></div><div className="flex justify-between"><dt>Close</dt><dd className="font-semibold">ESC</dd></div></dl>
+          </div>
+        </div>
+      ) : null}
       <FloatingActiveTimerBar
         activeTimerDetails={activeTimerDetails}
         onNavigateToActiveTimer={handleActiveTimerNavigate}
