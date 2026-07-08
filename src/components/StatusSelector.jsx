@@ -5,9 +5,9 @@ export const statusOptions = [
 ];
 
 const statusClassNames = {
-  not_tested: 'border-gray-300 bg-white text-gray-700',
-  weak: 'border-red-200 bg-red-50 text-red-700',
-  strong: 'border-red-600 bg-red-600 text-white',
+  not_tested: 'border-border bg-paper text-ink-muted',
+  weak: 'border-ember-600 bg-ember-50 text-ember-700',
+  strong: 'border-ember-600 bg-ember-600 text-white',
 };
 
 export function StatusSelector({ value, onChange }) {
@@ -15,7 +15,7 @@ export function StatusSelector({ value, onChange }) {
     <select
       value={value}
       onChange={(event) => onChange(event.target.value)}
-      className={`rounded-full border px-3 py-1 text-xs font-medium outline-none focus:ring-2 focus:ring-red-200 ${statusClassNames[value]}`}
+      className={`min-h-10 rounded-lg border px-3 py-2 text-xs font-medium outline-none transition-colors duration-150 hover:bg-sky-50 focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2 ${statusClassNames[value]}`}
     >
       {statusOptions.map((option) => (
         <option key={option.value} value={option.value}>

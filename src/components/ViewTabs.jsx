@@ -1,25 +1,29 @@
+import { BookOpen, LayoutDashboard } from 'lucide-react';
+
 const views = [
-  { id: 'dashboard', label: 'Dashboard' },
-  { id: 'study', label: 'Study Planner' },
+  { id: 'dashboard', label: 'Dashboard', Icon: LayoutDashboard },
+  { id: 'study', label: 'Study Planner', Icon: BookOpen },
 ];
 
 export function ViewTabs({ activeView, onViewChange }) {
   return (
-    <div className="mb-4 flex gap-2 border-b border-gray-200">
+    <div className="mb-4 flex gap-2 border-b border-border">
       {views.map((view) => {
         const isActive = view.id === activeView;
+        const Icon = view.Icon;
 
         return (
           <button
             key={view.id}
             type="button"
             onClick={() => onViewChange(view.id)}
-            className={`border-b-2 px-5 py-3 text-sm font-medium transition-colors ${
+            className={`inline-flex items-center gap-2 border-b-2 px-5 py-3 text-sm font-medium transition-colors duration-200 ease-in-out active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas ${
               isActive
-                ? 'border-red-600 text-red-700'
-                : 'border-transparent text-gray-600 hover:border-gray-300 hover:text-gray-900'
+                ? 'border-ember-600 text-ember-700'
+                : 'border-transparent text-ink-muted hover:border-sky-500 hover:bg-sky-50 hover:text-ink'
             }`}
           >
+            <Icon className="h-4 w-4" aria-hidden="true" />
             {view.label}
           </button>
         );

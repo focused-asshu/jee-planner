@@ -1,16 +1,24 @@
 import { useMemo } from 'react';
+import { CheckCircle2, Clock, Flame, Hourglass, Trophy } from 'lucide-react';
 import { defaultChapters, subjectLabels } from '../data/chapters';
 import { useActiveTimer } from '../hooks/useActiveTimer';
 import { formatStudyTime } from '../lib/format';
 import { getLocalDateKey } from '../lib/storage';
 import { getCompletionStats, getStreaks, getTodayCommittedSeconds, getTotalStudySeconds } from '../lib/stats';
 
-function StatCard({ label, value, helper }) {
+function StatCard({ label, value, helper, Icon, tone = 'neutral' }) {
+  const iconTone = tone === 'ember' ? 'bg-ember-50 text-ember-700' : 'bg-sky-50 text-sky-600';
+
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-      <p className="text-sm font-medium text-gray-500">{label}</p>
-      <p className="mt-3 text-3xl font-semibold tracking-tight text-gray-950">{value}</p>
-      {helper ? <p className="mt-2 text-xs text-gray-500">{helper}</p> : null}
+    <div className="rounded-xl border border-border bg-paper p-6 shadow-card transition duration-150 ease-out hover:shadow-card-hover">
+      <div className="flex items-start justify-between gap-3">
+        <p className="text-sm font-medium text-ink-muted">{label}</p>
+        <span className={`inline-flex h-10 w-10 items-center justify-center rounded-lg ${iconTone}`}>
+          <Icon className="h-5 w-5" aria-hidden="true" />
+        </span>
+      </div>
+      <p className="mt-4 text-2xl font-bold tabular-nums tracking-tight text-ink">{value}</p>
+      {helper ? <p className="mt-2 text-xs text-ink-muted">{helper}</p> : null}
     </div>
   );
 }
@@ -36,7 +44,7 @@ const getInProgressUncommittedSeconds = (timerSnapshot, storedActiveTimer) => {
 const didTimerStartToday = (storedActiveTimer) =>
   storedActiveTimer ? getLocalDateKey(storedActiveTimer.startedAtEpochMs) === getLocalDateKey(Date.now()) : false;
 
-const formatStreak = (streak, icon) => `${icon} ${streak} ${streak === 1 ? 'day' : 'days'}`;
+const formatStreak = (streak) => `${streak} ${streak === 1 ? 'day' : 'days'}`;
 
 export function Dashboard({ plannerData }) {
   const activeTimer = useActiveTimer();
@@ -58,10 +66,10 @@ export function Dashboard({ plannerData }) {
       : committedStreaks.currentStreak;
 
   return (
-    <div className="p-5">
+    <div className="p-6">
       <div className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-950">Dashboard</h2>
-        <p className="mt-1 text-sm text-gray-500">
+        <h2 className="text-lg font-semibold text-ink">Dashboard</h2>
+        <p className="mt-1 text-sm text-ink-muted">
           Live study totals, streaks, and committed progress across Physics, Chemistry, and Maths.
         </p>
       </div>
@@ -71,25 +79,29 @@ export function Dashboard({ plannerData }) {
           label="Total Chapters Completed"
           value={`${completionStats.completed} / ${completionStats.total}`}
           helper="Across Physics, Chemistry, and Maths"
+          Icon={CheckCircle2}
         />
-        <StatCard label="Total Study Hours" value={formatStudyTime(totalStudySeconds)} helper="Committed time plus active timer" />
+        <StatCard label="Total Study Hours" value={formatStudyTime(totalStudySeconds)} helper="Committed time plus active timer" Icon={Clock} />
         <StatCard
           label="Today's Study Time"
           value={todayStudySeconds > 0 ? formatStudyTime(todayStudySeconds) : 'No study yet'}
           helper="Committed sessions plus today's active timer"
+          Icon={Hourglass}
         />
         <StatCard
           label="Current Streak"
-          value={currentStreak > 0 ? formatStreak(currentStreak, '🔥') : 'Start today!'}
+          value={currentStreak > 0 ? formatStreak(currentStreak) : 'Start today!'}
           helper="Yesterday keeps the streak alive"
+          Icon={Flame}
+          tone="ember"
         />
-        <StatCard label="Best Streak" value={formatStreak(committedStreaks.bestStreak, '🏆')} helper="Longest committed run" />
+        <StatCard label="Best Streak" value={formatStreak(committedStreaks.bestStreak)} helper="Longest committed run" Icon={Trophy} tone="ember" />
       </div>
 
-      <div className="mt-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="mt-6 rounded-xl border border-border bg-paper p-6 shadow-card">
         <div className="mb-4">
-          <h3 className="text-base font-semibold text-gray-950">Subject Progress</h3>
-          <p className="mt-1 text-sm text-gray-500">Completion by subject, using the same criteria as the Study Planner.</p>
+          <h3 className="text-base font-semibold text-ink">Subject Progress</h3>
+          <p className="mt-1 text-sm text-ink-muted">Completion by subject, using the same criteria as the Study Planner.</p>
         </div>
 
         <div className="space-y-4">
@@ -99,13 +111,13 @@ export function Dashboard({ plannerData }) {
             return (
               <div key={subject}>
                 <div className="mb-2 flex items-center justify-between text-sm">
-                  <span className="font-medium text-gray-800">{subjectLabels[subject]}</span>
-                  <span className="text-gray-500">
+                  <span className="font-medium text-ink">{subjectLabels[subject]}</span>
+                  <span className="tabular-nums text-ink-muted">
                     {stats.completed} / {stats.total} chapters
                   </span>
                 </div>
-                <div className="h-3 overflow-hidden rounded-full bg-gray-100">
-                  <div className="h-full rounded-full bg-red-600" style={{ width: `${percent}%` }} />
+                <div className="h-3 overflow-hidden rounded-lg bg-border">
+                  <div className="h-full rounded-lg bg-ember-600 transition-[width] duration-300 ease-out" style={{ width: `${percent}%` }} />
                 </div>
               </div>
             );
