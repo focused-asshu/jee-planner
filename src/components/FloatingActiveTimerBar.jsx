@@ -1,3 +1,4 @@
+import { Pause, Square } from 'lucide-react';
 import { useActiveTimer } from '../hooks/useActiveTimer';
 
 const formatFloatingTime = (seconds) => {
@@ -38,17 +39,17 @@ export function FloatingActiveTimerBar({ activeTimerDetails, onNavigateToActiveT
         tabIndex={0}
         onClick={onNavigateToActiveTimer}
         onKeyDown={handleKeyDown}
-        className="w-full max-w-[460px] cursor-pointer rounded-2xl border border-gray-200 border-l-4 border-l-red-500 bg-white p-4 text-left shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-red-200"
+        className="floating-timer-enter w-full max-w-[520px] cursor-pointer rounded-xl border border-border border-l-4 border-l-ember-600 bg-paper p-4 text-left shadow-card transition duration-200 ease-out hover:-translate-y-0.5 hover:bg-sky-50 hover:shadow-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2"
         aria-label={`Jump to active timer for ${activeTimerDetails.subjectLabel}, ${activeTimerDetails.chapterName}`}
       >
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">🟢 Currently Studying</p>
-            <p className="mt-1 text-sm font-medium text-gray-950">
-              {activeTimerDetails.subjectLabel} <span className="text-gray-400">•</span> {activeTimerDetails.chapterName}
+            <p className="text-xs font-semibold uppercase tracking-wide text-ink-muted">Currently Studying</p>
+            <p className="mt-1 text-sm font-medium text-ink">
+              {activeTimerDetails.subjectLabel} <span className="text-ink-muted">•</span> {activeTimerDetails.chapterName}
             </p>
           </div>
-          <p className="rounded-full bg-red-50 px-3 py-1 font-mono text-lg font-semibold tabular-nums text-red-700">
+          <p className="timer-signature timer-signature-active rounded-lg bg-ember-50 px-3 py-1 text-lg font-bold tabular-nums text-ember-700">
             {formatFloatingTime(displaySeconds)}
           </p>
         </div>
@@ -60,8 +61,9 @@ export function FloatingActiveTimerBar({ activeTimerDetails, onNavigateToActiveT
               event.stopPropagation();
               onPause();
             }}
-            className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-200"
+            className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-border bg-paper px-4 py-2 text-sm font-medium text-ink-muted transition duration-150 hover:bg-sky-50 hover:text-ink active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2"
           >
+            <Pause className="h-4 w-4" aria-hidden="true" />
             Pause
           </button>
           <button
@@ -70,8 +72,9 @@ export function FloatingActiveTimerBar({ activeTimerDetails, onNavigateToActiveT
               event.stopPropagation();
               onStop();
             }}
-            className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-200"
+            className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-ember-600 px-4 py-2 text-sm font-semibold text-white transition duration-150 hover:bg-ember-700 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2"
           >
+            <Square className="h-4 w-4" aria-hidden="true" />
             Stop
           </button>
         </div>

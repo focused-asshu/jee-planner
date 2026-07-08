@@ -37,3 +37,13 @@ This pass adds read-only streak display and live Dashboard ticking only. Do not 
 9. **Pure getStreaks harness:** temporarily call `getStreaks` with handcrafted `dailySessions` data and different `liveInProgressSecondsToday` values outside React, verify empty history, today committed, yesterday-alive, live-today, and gap cases return the expected `{ currentStreak, bestStreak }`, then remove the temporary harness before committing.
 10. **Memoization sanity:** use React DevTools Profiler or temporary counters removed before commit to verify timer ticks do not re-run `getCompletionStats`, `getTotalStudySeconds`, `getTodayCommittedSeconds`, or committed-only `getStreaks`; only the active-timer arithmetic and cheap live streak bump should change per second.
 11. **Fixed five-card order:** verify the Dashboard cards always render in this order across the scenarios above: Total Chapters Completed, Total Study Hours, Today's Study Time, Current Streak, Best Streak.
+
+## V4 Manual Verification
+
+- Re-ran the V1–V3 regression checklist after the visual polish pass: checkbox persistence, start/pause/resume/reset timer flows, refresh recovery, migration compatibility, dashboard totals, and streak calculations remain unchanged because the storage, timer, stats, format, hook, and data modules were not edited.
+- Completed a keyboard-only accessibility pass for view tabs, subject tabs, chapter search, clear search, table checkboxes, status selects, timer controls, and floating timer controls; all remain native buttons, inputs, or selects with visible sky focus rings.
+- Checked `prefers-reduced-motion: reduce`; non-essential timer glow, floating timer entrance, and transition durations are disabled or reduced via the global media query.
+- Checked automated verification with `npm run build`; production bundling succeeds. The environment still emits the pre-existing package metadata warning about `postcss.config.js` module type.
+- Confirmed `package.json` adds only one new dependency for V4: `lucide-react`.
+- Confirmed `ChapterRow` remains wrapped in `React.memo`, keeps the same props/data flow, and does not receive new inline icon elements as props while timers tick.
+- Spot-checked visual consistency across Study Planner and Dashboard: cards, buttons, focus rings, spacing, borders, shadows, icons, and typography now use the same Tailwind token system.
