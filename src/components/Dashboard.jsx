@@ -62,7 +62,10 @@ function CircularProgress({ percent, label }) {
 
 const STUDY_HEATMAP_DAYS = 180;
 const DAY_MS = 24 * 60 * 60 * 1000;
-const weekdayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const weekdayLabels = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
+const STUDY_HEATMAP_CELL_SIZE = 12;
+const STUDY_HEATMAP_CELL_GAP = 3;
+const STUDY_HEATMAP_COLUMN_WIDTH = STUDY_HEATMAP_CELL_SIZE + STUDY_HEATMAP_CELL_GAP;
 const monthFormatter = new Intl.DateTimeFormat(undefined, { month: 'short' });
 const fullDateFormatter = new Intl.DateTimeFormat(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
 
@@ -122,19 +125,34 @@ const buildStudyHeatmapWeeks = (dailySessions = {}) => {
   return weeks;
 };
 
-const getStudyHeatmapMonthLabels = (weeks) =>
-  weeks
-    .map((week, index) => {
-      const firstVisibleDay = week.find((cell) => cell.inRange && cell.date.getDate() <= 7);
-      return firstVisibleDay ? { label: monthFormatter.format(firstVisibleDay.date), column: index } : null;
-    })
-    .filter(Boolean);
+const getStudyHeatmapMonthLabels = (weeks) => {
+  const seenMonths = new Set();
+  let previousColumn = -Infinity;
+
+  return weeks.reduce((labels, week, index) => {
+    const firstMonthDay = week.find((cell) => {
+      if (!cell.inRange) return false;
+      const monthKey = `${cell.date.getFullYear()}-${cell.date.getMonth()}`;
+      return !seenMonths.has(monthKey);
+    });
+
+    if (!firstMonthDay) return labels;
+
+    const monthKey = `${firstMonthDay.date.getFullYear()}-${firstMonthDay.date.getMonth()}`;
+    const row = index - previousColumn < 3 ? 1 : 0;
+    seenMonths.add(monthKey);
+    previousColumn = index;
+    labels.push({ label: monthFormatter.format(firstMonthDay.date), column: index, row });
+    return labels;
+  }, []);
+};
 
 const getStudyHeatmapLabel = (cell) => `${fullDateFormatter.format(cell.date)} — ${cell.seconds > 0 ? `${formatStudyTime(cell.seconds)} studied` : 'No study'}`;
 
 function StudyHeatmap({ dailySessions }) {
   const weeks = useMemo(() => buildStudyHeatmapWeeks(dailySessions), [dailySessions]);
   const monthLabels = useMemo(() => getStudyHeatmapMonthLabels(weeks), [weeks]);
+  const hasStudySessions = useMemo(() => Object.values(dailySessions ?? {}).some((session) => Math.max(0, Math.floor(session?.totalSeconds ?? 0)) > 0), [dailySessions]);
 
   return (
     <section className="rounded-2xl border border-border bg-paper p-6 shadow-card">
@@ -143,24 +161,27 @@ function StudyHeatmap({ dailySessions }) {
           <h3 className="text-base font-semibold text-ink">Study Heatmap</h3>
           <p className="mt-1 text-sm text-ink-muted">Last 180 days of committed study sessions from daily logs.</p>
         </div>
-        <div className="flex items-center gap-1.5 text-xs text-ink-muted" aria-hidden="true">
-          <span>Less</span>
-          {[0, 1, 2, 3, 4].map((level) => <span key={level} className={`h-3 w-3 rounded-sm border ${getStudyHeatmapCellClass(level)}`} />)}
-          <span>More</span>
-        </div>
       </div>
       <div className="overflow-x-auto pb-2">
         <div className="min-w-max">
-          <div className="relative ml-9 mb-2 h-4 text-xs text-ink-muted">
-            {monthLabels.map(({ label, column }) => <span key={`${label}-${column}`} className="absolute" style={{ left: `${column * 18}px` }}>{label}</span>)}
+          <div className="relative ml-8 mb-2 h-8 text-[10px] font-medium text-ink-muted">
+            {monthLabels.map(({ label, column, row }) => (
+              <span
+                key={`${label}-${column}`}
+                className="absolute whitespace-nowrap rounded-sm bg-paper/90 pr-1 leading-3"
+                style={{ left: `${column * STUDY_HEATMAP_COLUMN_WIDTH}px`, top: `${row * 14}px` }}
+              >
+                {label}
+              </span>
+            ))}
           </div>
           <div className="flex gap-2">
-            <div className="grid grid-rows-7 gap-1.5 pr-1 text-[10px] leading-3 text-ink-muted">
-              {weekdayLabels.map((day, index) => <span key={day} className="h-3.5 tabular-nums">{index % 2 === 1 ? day : ''}</span>)}
+            <div className="grid grid-rows-7 gap-[3px] pr-1 text-[10px] font-medium leading-3 text-stone-400">
+              {weekdayLabels.map((day, index) => <span key={`${day}-${index}`} className="h-3 tabular-nums">{day}</span>)}
             </div>
-            <div className="flex gap-1.5" role="grid" aria-label="Study heatmap for the last 180 days including today">
+            <div className="flex gap-[3px]" role="grid" aria-label="Study heatmap for the last 180 days including today">
               {weeks.map((week, weekIndex) => (
-                <div key={week[0]?.dateKey ?? weekIndex} className="grid grid-rows-7 gap-1.5" role="row">
+                <div key={week[0]?.dateKey ?? weekIndex} className="grid grid-rows-7 gap-[3px]" role="row">
                   {week.map((cell) => {
                     const label = getStudyHeatmapLabel(cell);
                     return (
@@ -170,13 +191,21 @@ function StudyHeatmap({ dailySessions }) {
                         disabled={!cell.inRange}
                         title={label}
                         aria-label={label}
-                        className={`h-3.5 w-3.5 rounded-[4px] border transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500 focus-visible:ring-offset-2 ${cell.inRange ? getStudyHeatmapCellClass(cell.intensity) : 'border-transparent bg-transparent'}`}
+                        className={`h-3 w-3 rounded-[4px] border transition duration-150 ease-out hover:scale-110 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500 focus-visible:ring-offset-2 ${cell.inRange ? getStudyHeatmapCellClass(cell.intensity) : 'border-transparent bg-transparent'}`}
                       />
                     );
                   })}
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          {!hasStudySessions ? <p className="text-sm text-ink-muted">Your study journey starts with the first session.</p> : <span aria-hidden="true" />}
+          <div className="ml-auto flex items-center gap-1.5 text-xs text-ink-muted" aria-hidden="true">
+            <span>Less</span>
+            {[0, 1, 2, 3, 4].map((level) => <span key={level} className={`h-3 w-3 rounded-[4px] border ${getStudyHeatmapCellClass(level)}`} />)}
+            <span>More</span>
           </div>
         </div>
       </div>
